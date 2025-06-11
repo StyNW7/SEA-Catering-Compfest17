@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,9 +7,82 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model for authentication and authorization
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String
-  name     String?
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?   // Hashed password
+  role          Role      @default(USER) // USER or ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  subscriptions Subscription[]
+  testimonials  Testimonial[]
+  accounts      Account[] // For NextAuth.js to link with providers
+}
+
+// NextAuth.js Account model
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// Enum for user roles
+enum Role {
+  USER
+  ADMIN
+}
+
+// MealPlan model
+model MealPlan {
+  id          String @id @default(cuid())
+  name        String @unique
+  pricePerMeal Float
+  description String
+  imageUrl    String? // Optional image URL
+  subscriptions Subscription[]
+}
+
+// Subscription model
+model Subscription {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  planId        String
+  mealPlan      MealPlan @relation(fields: [planId], references: [id])
+  mealTypes     String[] // e.g., ["Breakfast", "Lunch", "Dinner"]
+  deliveryDays  String[] // e.g., ["Monday", "Tuesday"]
+  allergies     String?  @db.Text
+  totalPrice    Float
+  startDate     DateTime @default(now())
+  endDate       DateTime? // Optional, for pausing or fixed-term subscriptions
+  status        String   @default("Active") // Active, Paused, Canceled
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Testimonial model
+model Testimonial {
+  id          String   @id @default(cuid())
+  customerId  String?  // Optional, if linked to a registered user
+  customerName String
+  reviewMessage String   @db.Text
+  rating      Int      // 1-5 stars
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User?    @relation(fields: [customerId], references: [id]) // Optional relationship
 }
