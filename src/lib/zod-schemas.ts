@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // --- Authentication Schemas ---
 export const registerSchema = z.object({
-  name: z.string().min(1, "Full name is required"),
+  fullName: z.string().min(1, "Full name is required"), // Changed to fullName
   email: z.string().email("Invalid email address"),
   password: z
     .string()

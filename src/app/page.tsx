@@ -27,11 +27,13 @@ import {
   Utensils,
   Shield,
   Zap,
+  PersonStandingIcon,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
 export default function HomePage() {
+
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -68,7 +70,15 @@ export default function HomePage() {
             </Link>
           </nav>
 
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">Order Now</Button>
+          <nav className="hidden md:flex items-center space-x-4">
+            <Link href={"/auth/login"}>
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">Login</Button>
+            </Link>
+            <Link href={"/auth/register"}>
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">Register</Button>
+            </Link>
+          </nav>
+
         </div>
       </header>
 
@@ -86,9 +96,8 @@ export default function HomePage() {
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold leading-tight">
                   Healthy Meals
-                  <span className="text-emerald-600 dark:text-emerald-400"> Delivered</span>
+                  <span className="text-emerald-600 dark:text-emerald-400"> Anytime, Anywhere </span>
                   <br />
-                  Across Indonesia
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-lg">
                   Customizable healthy meal plans crafted by expert chefs and delivered fresh to your doorstep. Join
@@ -126,9 +135,9 @@ export default function HomePage() {
             >
               <div className="relative">
                 <Image
-                  src="/placeholder.svg?height=600&width=500"
+                  src="/images/landing/banner.png"
                   alt="Healthy meal delivery"
-                  width={500}
+                  width={680}
                   height={600}
                   className="rounded-2xl shadow-2xl"
                 />
@@ -200,9 +209,9 @@ export default function HomePage() {
 
             <div className="relative">
               <Image
-                src="/placeholder.svg?height=500&width=500"
+                src="/images/landing/food-culture.png"
                 alt="About SEA Catering"
-                width={500}
+                width={900}
                 height={500}
                 className="rounded-2xl shadow-lg"
               />
@@ -347,15 +356,15 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative">
               <Image
-                src="/placeholder.svg?height=500&width=500"
+                src="/images/stanley.jpg"
                 alt="SEA Catering Founder"
-                width={500}
-                height={500}
+                width={400}
+                height={400}
                 className="rounded-2xl shadow-lg"
               />
               <div className="absolute -bottom-6 -right-6 bg-emerald-500 text-white p-4 rounded-xl shadow-lg">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">2019</div>
+                  <div className="text-2xl font-bold">2025</div>
                   <div className="text-sm">Founded</div>
                 </div>
               </div>
@@ -363,8 +372,8 @@ export default function HomePage() {
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-2xl font-bold mb-2">Chef Sarah Wijaya</h3>
-                <p className="text-emerald-600 dark:text-emerald-400 font-medium mb-4">Founder & Head Chef</p>
+                <h3 className="text-2xl font-bold mb-2">Stanley Nathanael Wijaya</h3>
+                <p className="text-emerald-600 dark:text-emerald-400 font-medium mb-4">Founder and CEO of SEA Catering</p>
                 <p className="text-muted-foreground mb-6">
                   &quot;I started SEA Catering with a simple mission: to make healthy eating accessible to everyone in
                   Indonesia. Having worked in top restaurants across Southeast Asia, I saw how difficult it was for busy
@@ -443,7 +452,7 @@ export default function HomePage() {
                 content:
                   "SEA Catering has been a game-changer for my busy lifestyle. The meals are delicious, healthy, and always delivered on time. I've lost 15kg in 6 months!",
                 rating: 5,
-                avatar: "/placeholder.svg?height=60&width=60",
+                avatar: "/images/placeholder/avatar-1.png",
               },
               {
                 name: "Sari Dewi",
@@ -451,7 +460,7 @@ export default function HomePage() {
                 content:
                   "As a working mom, SEA Catering saves me so much time while ensuring my family eats healthy. The variety is amazing and my kids love the meals too!",
                 rating: 5,
-                avatar: "/placeholder.svg?height=60&width=60",
+                avatar: "/images/placeholder/avatar-2.png",
               },
               {
                 name: "Budi Santoso",
@@ -459,7 +468,7 @@ export default function HomePage() {
                 content:
                   "The muscle-building plan is perfect for my training regimen. High-quality ingredients, perfect portions, and excellent taste. Highly recommended!",
                 rating: 5,
-                avatar: "/placeholder.svg?height=60&width=60",
+                avatar: "/images/placeholder/avatar-3.png",
               },
             ].map((testimonial, index) => (
               <Card key={index} className="hover:shadow-lg transition-all duration-300">
@@ -566,8 +575,12 @@ export default function HomePage() {
                 <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
+                    <PersonStandingIcon className="h-5 w-5 text-emerald-600" />
+                    <span>Brian, Manager</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
                     <Phone className="h-5 w-5 text-emerald-600" />
-                    <span>+62 21 1234 5678</span>
+                    <span>+62 12 3456 789</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Mail className="h-5 w-5 text-emerald-600" />
@@ -652,7 +665,7 @@ export default function HomePage() {
                 <Zap className="h-5 w-5 mr-2" />
                 Start Your Journey Today
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8">
+              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8">
                 View Sample Menu
               </Button>
             </div>
@@ -671,7 +684,7 @@ export default function HomePage() {
                 </div>
                 <span className="text-xl font-bold text-emerald-400">SEA Catering</span>
               </div>
-              <p className="text-gray-400">Transforming Indonesia&apos;s food culture, one healthy meal at a time.</p>
+              <p className="text-gray-400">Healthy Meals, Anytime, Anywhere</p>
               <div className="flex space-x-4">
                 <Button size="icon" variant="ghost" className="hover:bg-gray-800">
                   <Instagram className="h-4 w-4" />
