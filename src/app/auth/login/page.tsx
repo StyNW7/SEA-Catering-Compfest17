@@ -1,31 +1,116 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ChefHat, Eye, EyeOff, Mail, Lock, ArrowRight, Leaf, Utensils, Heart } from "lucide-react"
+import { ChefHat, Eye, EyeOff, Mail, Lock, ArrowRight, Leaf, Utensils, Heart, Loader2Icon } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner";
+import { useRouter } from "next/navigation"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { loginSchema } from "@/lib/zod-schemas"
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+type DotStyle = {
+  top: string
+  left: string
+  animationDelay: string
+  animationDuration: string
+}
 
 export default function LoginPage() {
-  
+
   const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+
   const [isLoaded, setIsLoaded] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [, setMousePosition] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    setIsLoaded(true)
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY })
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [])
+
+  const [dotStyles, setDotStyles] = useState<DotStyle[]>([])
+
+  useEffect(() => {
+    const newStyles = Array.from({ length: 12 }).map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 3}s`,
+      animationDuration: `${2 + Math.random() * 3}s`,
+    }))
+    setDotStyles(newStyles)
+  }, [])
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = form;
 
   useEffect(() => {
     setIsLoaded(true)
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle login logic here
-    console.log("Login attempt:", { email, password })
-  }
+  const onSubmit = async (data: LoginFormValues) => {
+  
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast("Login Failed!",{
+          description: result.error || 'Login failed',
+        })
+        // throw new Error(result.error || 'Login failed');
+      }
+
+      else {
+        toast("Login Successful!",{
+          description: "You are logged in right now",
+        })
+
+        router.push("/");
+      }
+
+    } catch (error: any) {
+
+      console.error("Login error:", error);
+
+      toast("Login Failed!",{
+        description: error || "Something went wrong. Please try again.",
+      })
+
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-orange-50 dark:from-emerald-950/20 dark:via-background dark:to-orange-950/20 relative overflow-hidden">
@@ -52,17 +137,12 @@ export default function LoginPage() {
         </div>
 
         {/* Floating Particles */}
-        {[...Array(6)].map((_, i) => (
-          <div
+         {dotStyles.map((style, i) => (
+            <div
             key={i}
-            className={`absolute w-2 h-2 bg-emerald-300/50 dark:bg-emerald-600/30 rounded-full animate-ping`}
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-            }}
-          />
+            className="absolute w-3 h-3 bg-gradient-to-r from-emerald-300/50 to-orange-300/50 dark:from-emerald-600/30 dark:to-orange-600/30 rounded-full animate-ping"
+            style={style}
+            />
         ))}
       </div>
 
@@ -98,7 +178,7 @@ export default function LoginPage() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium">
                     Email Address
@@ -108,13 +188,12 @@ export default function LoginPage() {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      {...register("email")}
                       className="pl-10 h-12 border-2 focus:border-emerald-500 transition-colors"
-                      required
+                      placeholder="your@email.com"
                     />
                   </div>
+                  {errors.email && <p className="text-destructive text-sm mt-1">{errors.email.message}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -126,11 +205,9 @@ export default function LoginPage() {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      {...register("password")}
                       className="pl-10 pr-10 h-12 border-2 focus:border-emerald-500 transition-colors"
-                      required
+                      placeholder="Enter your password"
                     />
                     <button
                       type="button"
@@ -140,6 +217,7 @@ export default function LoginPage() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  {errors.password && <p className="text-destructive text-sm mt-1">{errors.password.message}</p>}
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
@@ -155,9 +233,18 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   className="w-full h-12 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 group"
+                  disabled={isSubmitting}
                 >
-                  Sign In
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  {isSubmitting ? (
+                    <>
+                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Signing In...
+                    </>
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
                 </Button>
               </form>
 
@@ -172,5 +259,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

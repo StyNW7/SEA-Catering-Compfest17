@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// src/lib/auth.ts
+
 import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
@@ -21,7 +23,6 @@ export const {
     signIn: "/auth/login",
     signOut: "/auth/logout",
     error: "/auth/error",
-    // newUser: '/auth/register', // Uncomment if you want to redirect to a registration page after successful signup
   },
   providers: [
     Credentials({
@@ -30,44 +31,57 @@ export const {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
+        console.log("NextAuth: Attempting to authorize credentials for email:", credentials?.email);
+
         const parsedCredentials = loginSchema.safeParse(credentials);
 
-        if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-
-          const user = await prisma.user.findUnique({
-            where: { email },
-          });
-
-          if (!user || !user.password) return null;
-
-          const passwordsMatch = await compare(password, user.password);
-
-          if (passwordsMatch) {
-            // Return user object including the role. This must match your extended `User` interface.
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-            };
-          }
+        if (!parsedCredentials.success) {
+          console.log("NextAuth: Authorization failed: Invalid credentials format.", parsedCredentials.error.flatten().fieldErrors);
+          return null; // Return null for invalid input format
         }
-        return null;
+
+        const { email, password } = parsedCredentials.data;
+
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        if (!user) {
+          console.log("NextAuth: Authorization failed: User not found for email:", email);
+          return null; // User not found in DB
+        }
+
+        if (!user.password) {
+          console.log("NextAuth: Authorization failed: User found but no password set (e.g., social login user) for email:", email);
+          return null; // User exists but doesn't have a password for credentials login
+        }
+
+        const passwordsMatch = await compare(password, user.password);
+
+        if (passwordsMatch) {
+          console.log("NextAuth: Authorization successful for user:", user.email);
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } else {
+          console.log("NextAuth: Authorization failed: Password mismatch for email:", email);
+          return null; // Password does not match
+        }
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // user object comes from the authorize function
         token.id = user.id;
-        token.role = (user as any).role; // Temporary cast to `any` can sometimes help with strict type checking, but should ideally match the User type fully.
+        token.role = (user as any).role;
       }
       return token;
     },
     async session({ session, token }) {
-      // token object comes from the jwt callback
       if (token?.id) {
         session.user.id = token.id;
       }
@@ -84,30 +98,23 @@ export const {
   },
 });
 
-// Extend the Session and JWT types for TypeScript
-// These declarations merge with the default types provided by next-auth.
 declare module "next-auth" {
-  // Extend the default Session interface to include 'id' and 'role' on the 'user' object
   interface Session {
     user: {
-      id: string; // Add the user ID
-      role: string; // Add the user role
-    } & DefaultSession["user"]; // Merge with default session user properties
+      id: string;
+      role: string;
+    } & DefaultSession["user"];
   }
 
-  // Extend the default User interface to include 'id' and 'role'
-  // This type is used internally by NextAuth, particularly in the `authorize` callback
-  // and by adapters. Ensure it includes all properties your `User` model has that you want.
   interface User extends DefaultUser {
-    id: string; // Ensures `id` is present, although often default
-    role: string; // Custom property from your Prisma `User` model
+    id: string;
+    role: string;
   }
 }
 
 declare module "next-auth/jwt" {
-  // Extend the default JWT interface to include 'id' and 'role'
   interface JWT {
-    id: string; // Add the user ID to the token
-    role: string; // Add the user role to the token
+    id: string;
+    role: string;
   }
 }

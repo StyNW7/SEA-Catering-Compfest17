@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/app/auth/register/page.tsx
-
 "use client"; // This MUST be the very first line of your client component file
 
 import React, { useState, useEffect } from "react";
@@ -21,6 +19,7 @@ import { toast } from "sonner";
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const router = useRouter(); // Correct useRouter import
@@ -41,16 +40,18 @@ export default function RegisterPage() {
   }, []);
 
   const onSubmit = async (data: RegisterFormValues) => {
+
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: data.fullName, // Map fullName from form to 'name' for your Prisma User model
+          fullName: data.fullName,
           email: data.email,
           password: data.password,
+          role: "USER",
         }),
       });
 
@@ -64,14 +65,14 @@ export default function RegisterPage() {
         description: "You can now log in with your new account.",
       })
 
-      router.push("/auth/login"); // Redirect after successful registration
+      router.push("/auth/login");
 
     } catch (error: any) {
 
       console.error("Registration error:", error);
 
       toast("Registration Failed!",{
-        description: "Something went wrong. Please try again.",
+        description: error || "Something went wrong. Please try again.",
       })
 
     }
