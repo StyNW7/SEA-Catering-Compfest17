@@ -2,8 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   experimental: {
-    serverActions: true,
-    optimizePackageImports: ['@radix-ui/react-dialog'],
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
   images: {
     remotePatterns: [
@@ -15,10 +14,7 @@ const nextConfig = {
   },
   devIndicators: {
     buildActivity: false,
-  },
-  // Modern alternative to handle CSR bailout warnings
-  reactStrictMode: true,
-  transpilePackages: ['@radix-ui/react-slot']
+  }
 }
 
 module.exports = nextConfig
