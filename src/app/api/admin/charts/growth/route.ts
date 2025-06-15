@@ -1,22 +1,30 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { subDays, eachDayOfInterval, format } from 'date-fns'
+import { getServerSession } from '@/lib/session'
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession()
+    
+    if (session?.user?.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '30')
 
     const endDate = new Date()
     const startDate = subDays(endDate, days - 1)
 
-    // Generate all days in the range
     const daysInRange = eachDayOfInterval({
       start: startDate,
       end: endDate
     })
 
-    // Get growth data for each day
     const growthData = await Promise.all(
       daysInRange.map(async (date) => {
         const nextDay = new Date(date)

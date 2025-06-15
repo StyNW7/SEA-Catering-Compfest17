@@ -1,22 +1,30 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { subMonths, eachMonthOfInterval, format } from 'date-fns'
+import { getServerSession } from '@/lib/session'
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession()
+    
+    if (session?.user?.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const months = parseInt(searchParams.get('months') || '6')
 
     const endDate = new Date()
     const startDate = subMonths(endDate, months - 1)
 
-    // Generate all months in the range
     const monthsInRange = eachMonthOfInterval({
       start: startDate,
       end: endDate
     })
 
-    // Get revenue data for each month
     const revenueData = await Promise.all(
       monthsInRange.map(async (monthStart) => {
         const monthEnd = new Date(monthStart)

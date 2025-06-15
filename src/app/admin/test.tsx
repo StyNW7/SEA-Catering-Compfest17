@@ -1,6 +1,13 @@
+"use client";
+
 import { useState, useEffect } from 'react'
 import { DateRange } from 'react-day-picker'
-import { startOfMonth, endOfMonth, subDays, format } from 'date-fns'
+import { 
+  startOfMonth, 
+  endOfMonth, 
+  subDays, 
+  format,
+} from 'date-fns'
 import {
   Card,
   CardContent,
@@ -24,6 +31,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { Skeleton } from '@/components/ui/skeleton'
+import {toast} from "sonner"
 
 // Types
 interface MetricCardProps {
@@ -44,6 +52,17 @@ interface ChartData {
   cancelled?: number
   value?: number
   color?: string
+}
+
+interface DashboardMetrics {
+  newSubscriptions: number
+  newSubscriptionsChange: number
+  mrr: number
+  mrrChange: number
+  reactivations: number
+  reactivationsChange: number
+  activeSubscriptions: number
+  activeSubscriptionsChange: number
 }
 
 // Helper components
@@ -80,15 +99,15 @@ const LoadingSkeleton = () => (
   </div>
 )
 
-// Main component
 export default function AdminDashboard() {
+
   const [isLoaded, setIsLoaded] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date()),
   })
   const [selectedPeriod, setSelectedPeriod] = useState("30d")
-  const [metrics, setMetrics] = useState({
+  const [metrics, setMetrics] = useState<DashboardMetrics>({
     newSubscriptions: 0,
     newSubscriptionsChange: 0,
     mrr: 0,
@@ -138,47 +157,98 @@ export default function AdminDashboard() {
     }
   }
 
-  // Fetch data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoaded(false)
-        
-        // Format dates for API
-        const from = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : ''
-        const to = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : ''
+  // Fetch dashboard metrics
+  const fetchMetrics = async () => {
+    try {
+      if (!dateRange.from || !dateRange.to) return
+      
+      const from = format(dateRange.from, 'yyyy-MM-dd')
+      const to = format(dateRange.to, 'yyyy-MM-dd')
 
-        // Fetch all data in parallel
-        const [metricsRes, revenueRes, growthRes, planRes] = await Promise.all([
-          fetch(`/api/admin/metrics?from=${from}&to=${to}`),
-          fetch('/api/admin/charts/revenue?months=6'),
-          fetch('/api/admin/charts/growth?days=30'),
-          fetch('/api/admin/charts/plans')
-        ])
-
-        if (!metricsRes.ok || !revenueRes.ok || !growthRes.ok || !planRes.ok) {
-          throw new Error('Failed to fetch data')
-        }
-
-        const [metricsData, revenueData, growthData, planData] = await Promise.all([
-          metricsRes.json(),
-          revenueRes.json(),
-          growthRes.json(),
-          planRes.json()
-        ])
-
-        setMetrics(metricsData)
-        setRevenueData(revenueData)
-        setGrowthData(growthData)
-        setPlanData(planData)
-        setIsLoaded(true)
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error)
-        setIsLoaded(true) // Still show UI even if there's an error
-      }
+      const response = await fetch(`/api/admin/metrics?from=${from}&to=${to}`)
+      if (!response.ok) throw new Error('Failed to fetch metrics')
+      
+      const data = await response.json()
+      setMetrics(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load dashboard metrics',
+      })
     }
+  }
 
-    fetchData()
+  // Fetch revenue chart data
+  const fetchRevenueData = async () => {
+    try {
+      const response = await fetch('/api/admin/charts/revenue?months=6')
+      if (!response.ok) throw new Error('Failed to fetch revenue data')
+      
+      const data = await response.json()
+      setRevenueData(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load revenue data',
+      })
+    }
+  }
+
+  // Fetch growth chart data
+  const fetchGrowthData = async () => {
+    try {
+      const response = await fetch('/api/admin/charts/growth?days=30')
+      if (!response.ok) throw new Error('Failed to fetch growth data')
+      
+      const data = await response.json()
+      setGrowthData(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load growth data',
+      })
+    }
+  }
+
+  // Fetch plan distribution data
+  const fetchPlanData = async () => {
+    try {
+      const response = await fetch('/api/admin/charts/plans')
+      if (!response.ok) throw new Error('Failed to fetch plan data')
+      
+      const data = await response.json()
+      setPlanData(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load plan distribution data',
+      })
+    }
+  }
+
+  // Fetch all data
+  const fetchAllData = async () => {
+    setIsLoaded(false)
+    try {
+      await Promise.all([
+        fetchMetrics(),
+        fetchRevenueData(),
+        fetchGrowthData(),
+        fetchPlanData()
+      ])
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    } finally {
+      setIsLoaded(true)
+    }
+  }
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchAllData()
+  }, [])
+
+  // Refetch metrics when date range changes
+  useEffect(() => {
+    if (isLoaded) {
+      fetchMetrics()
+    }
   }, [dateRange])
 
   // Period buttons

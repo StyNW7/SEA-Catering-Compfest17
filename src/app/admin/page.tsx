@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
@@ -48,10 +49,44 @@ import {
   Pie,
   Cell,
 } from "recharts"
+import { toast } from "sonner"
+import { useAuth } from "@/context/AuthContext"
 
 interface DateRange {
   from: Date
   to: Date
+}
+
+// Types
+interface MetricCardProps {
+  title: string
+  value: string
+  change: number
+  isCurrency?: boolean
+}
+
+interface ChartData {
+  month?: string
+  date?: string
+  name?: string
+  revenue?: number
+  subscriptions?: number
+  active?: number
+  new?: number
+  cancelled?: number
+  value?: number
+  color?: string
+}
+
+interface DashboardMetrics {
+  newSubscriptions: number
+  newSubscriptionsChange: number
+  mrr: number
+  mrrChange: number
+  reactivations: number
+  reactivationsChange: number
+  activeSubscriptions: number
+  activeSubscriptionsChange: number
 }
 
 const sidebarItems = [
@@ -91,6 +126,8 @@ const planDistributionData = [
 
 export default function AdminDashboard() {
 
+  const {user} = useAuth();
+
   const [isLoaded, setIsLoaded] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange>({
     from: startOfMonth(new Date()),
@@ -114,17 +151,20 @@ export default function AdminDashboard() {
     return new Intl.NumberFormat("id-ID").format(num)
   }
 
-  // Mock metrics based on selected date range
-  const metrics = {
-    newSubscriptions: 342,
-    newSubscriptionsChange: 12.5,
-    mrr: 67500000,
-    mrrChange: 8.3,
-    reactivations: 28,
-    reactivationsChange: -5.2,
-    activeSubscriptions: 1680,
-    activeSubscriptionsChange: 15.7,
-  }
+  const [metrics, setMetrics] = useState<DashboardMetrics>({
+      newSubscriptions: 0,
+      newSubscriptionsChange: 0,
+      mrr: 0,
+      mrrChange: 0,
+      reactivations: 0,
+      reactivationsChange: 0,
+      activeSubscriptions: 0,
+      activeSubscriptionsChange: 0,
+    })
+
+  const [revenueData, setRevenueData] = useState<ChartData[]>([])
+  const [growthData, setGrowthData] = useState<ChartData[]>([])
+  const [planData, setPlanData] = useState<ChartData[]>([])
 
   const handlePeriodChange = (period: string) => {
     setSelectedPeriod(period)
@@ -148,6 +188,114 @@ export default function AdminDashboard() {
     }
   }
 
+
+  // Fetch dashboard metrics
+  const fetchMetrics = async () => {
+    try {
+      if (!dateRange.from || !dateRange.to) return
+      
+      const from = format(dateRange.from, 'yyyy-MM-dd')
+      const to = format(dateRange.to, 'yyyy-MM-dd')
+
+      const response = await fetch(`/api/admin/metrics?from=${from}&to=${to}`)
+      if (!response.ok) throw new Error('Failed to fetch metrics')
+      
+      const data = await response.json()
+      setMetrics(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load dashboard metrics',
+      })
+    }
+  }
+
+  // Fetch revenue chart data
+  const fetchRevenueData = async () => {
+    try {
+      const response = await fetch('/api/admin/charts/revenue?months=6')
+      if (!response.ok) throw new Error('Failed to fetch revenue data')
+      
+      const data = await response.json()
+      setRevenueData(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load revenue data',
+      })
+    }
+  }
+
+  // Fetch growth chart data
+  const fetchGrowthData = async () => {
+    try {
+      const response = await fetch('/api/admin/charts/growth?days=30')
+      if (!response.ok) throw new Error('Failed to fetch growth data')
+      
+      const data = await response.json()
+      setGrowthData(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load growth data',
+      })
+    }
+  }
+
+  // Fetch plan distribution data
+  const fetchPlanData = async () => {
+    try {
+      const response = await fetch('/api/admin/charts/plans')
+      if (!response.ok) throw new Error('Failed to fetch plan data')
+      
+      const data = await response.json()
+      setPlanData(data)
+    } catch {
+      toast('Error',{
+        description: 'Failed to load plan distribution data',
+      })
+    }
+  }
+
+  // Fetch all data
+  const fetchAllData = async () => {
+    setIsLoaded(false)
+    try {
+      await Promise.all([
+        fetchMetrics(),
+        fetchRevenueData(),
+        fetchGrowthData(),
+        fetchPlanData()
+      ])
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    } finally {
+      setIsLoaded(true)
+    }
+  }
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchAllData()
+  }, [])
+
+  // Refetch metrics when date range changes
+  useEffect(() => {
+    if (isLoaded) {
+      fetchMetrics()
+    }
+  }, [])
+
+  // Period buttons
+  const periodButtons = [
+    { label: "7D", value: "7d" },
+    { label: "30D", value: "30d" },
+    { label: "90D", value: "90d" },
+    { label: "1Y", value: "1y" },
+    { label: "MTD", value: "mtd" },
+  ]
+
+  // Colors for charts
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+
+
   return (
     
     <div className="min-h-screen bg-background flex">
@@ -170,12 +318,12 @@ export default function AdminDashboard() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-3">
             <Avatar className="h-12 w-12">
-              <AvatarImage src="/placeholder.svg?height=48&width=48" />
+              <AvatarImage src="/images/placeholder/avatar-1.png" />
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
             <div>
-              <div className="font-semibold">Admin User</div>
-              <div className="text-sm text-muted-foreground">admin@seacatering.id</div>
+              <div className="font-semibold">{user?.name}</div>
+              <div className="text-sm text-muted-foreground">{user?.email}</div>
             </div>
           </div>
         </div>
@@ -428,7 +576,7 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={subscriptionGrowthData}>
+                    <LineChart data={growthData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" tickFormatter={(value: string | number | Date) => format(new Date(value), "MMM dd")} />
                       <YAxis />
@@ -487,7 +635,7 @@ export default function AdminDashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={planDistributionData}
+                        data={planData}
                         cx="50%"
                         cy="50%"
                         innerRadius={60}
@@ -495,7 +643,7 @@ export default function AdminDashboard() {
                         paddingAngle={5}
                         dataKey="value"
                       >
-                        {planDistributionData.map((entry, index) => (
+                        {planData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -504,7 +652,7 @@ export default function AdminDashboard() {
                   </ResponsiveContainer>
                 </div>
                 <div className="space-y-2 mt-4">
-                  {planDistributionData.map((plan, index) => (
+                  {planData.map((plan, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: plan.color }} />
@@ -518,7 +666,8 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Recent Activity */}
-            <Card className="col-span-2">
+            {/* <Card className="col-span-2">
+
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Activity className="h-5 w-5 text-blue-600" />
@@ -526,7 +675,9 @@ export default function AdminDashboard() {
                 </CardTitle>
                 <CardDescription>Latest subscription activities and updates</CardDescription>
               </CardHeader>
+
               <CardContent>
+
                 <div className="space-y-4">
                   {[
                     {
@@ -614,7 +765,8 @@ export default function AdminDashboard() {
                   })}
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
+
           </div>
         </div>
       </div>

@@ -35,6 +35,7 @@ import { format } from "date-fns"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/AuthContext"
 
 interface Subscription {
   id: string
@@ -87,6 +88,7 @@ const sidebarItems = [
 
 export default function UserDashboard() {
 
+  const {user} = useAuth();
   const router = useRouter();
 
   const [isLoaded, setIsLoaded] = useState(false)
@@ -285,8 +287,8 @@ export default function UserDashboard() {
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             <div>
-              <div className="font-semibold">John Doe</div>
-              <div className="text-sm text-muted-foreground">john@example.com</div>
+              <div className="font-semibold">{user?.name}</div>
+              <div className="text-sm text-muted-foreground">{user?.email}</div>
             </div>
           </div>
         </div>
