@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'standalone',
+  experimental: {
+    serverActions: true,
+    optimizePackageImports: ['@radix-ui/react-dialog'],
+  },
   images: {
     remotePatterns: [
       {
@@ -13,6 +16,9 @@ const nextConfig: NextConfig = {
   devIndicators: {
     buildActivity: false,
   },
-};
+  // Modern alternative to handle CSR bailout warnings
+  reactStrictMode: true,
+  transpilePackages: ['@radix-ui/react-slot']
+}
 
-export default nextConfig;
+module.exports = nextConfig
