@@ -2,17 +2,13 @@ import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { MealPlan } from '@/types/index'
 
-interface RequestContext {
-  params: { id: string }
-}
-
 // Update Meal Plan
 export async function PUT(
   request: NextRequest,
-  context: RequestContext
+  { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
-    const { id } = context.params
+    const { id } = params
     const body: MealPlan = await request.json()
 
     // Verify meal plan exists
@@ -64,10 +60,10 @@ export async function PUT(
 // Delete Meal Plan
 export async function DELETE(
   request: NextRequest,
-  context: RequestContext
+  { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
-    const { id } = context.params
+    const { id } = params
 
     // Verify meal plan exists
     const existingMealPlan = await prisma.mealPlan.findUnique({
