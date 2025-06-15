@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { useMobileMenu } from "@/hooks/useMobileMenu"
 
 export function Navbar() {
+
   const { isOpen, toggleMenu, closeMenu } = useMobileMenu()
   const { user, logout } = useAuth()
   const pathname = usePathname()
@@ -53,11 +54,25 @@ export function Navbar() {
         {/* Desktop Auth Buttons */}
         {user ? (
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/dashboard">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                Dashboard
-              </Button>
-            </Link>
+
+            {user.role === "ADMIN" ? (
+              <Link href="/admin">
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  Admin Dashboard
+                </Button>
+              </Link>
+            ) : 
+
+              (
+                <Link href="/dashboard">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    User Dashboard
+                  </Button>
+                </Link>
+              )
+            
+            }
+
             <Button
               variant="outline" className="text-emerald-600 hover:text-emerald-700 border-emerald-600 hover:bg-emerald-50"
               onClick={logout}
@@ -117,13 +132,29 @@ export function Navbar() {
           <div className="pt-4 space-y-4 border-t">
             {user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="block w-full py-2 text-center font-medium text-emerald-600"
-                  onClick={closeMenu}
-                >
-                  Dashboard
-                </Link>
+
+                {user.role === "ADMIN" ? (
+                  <Link
+                    href="/admin"
+                    className="block w-full py-2 text-center font-medium text-emerald-600"
+                    onClick={closeMenu}
+                  >
+                    Admin Dashboard
+                  </Link>
+                ) : 
+
+                  (
+                    <Link
+                      href="/dashboard"
+                      className="block w-full py-2 text-center font-medium text-emerald-600"
+                      onClick={closeMenu}
+                    >
+                      User Dashboard
+                    </Link>
+                  )
+                
+                }
+
                 <Button
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                   onClick={() => {
