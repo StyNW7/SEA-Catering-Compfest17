@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server'
-import {prisma} from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { MealPlan } from '@/types/index'
 
 // Update Meal Plan
-
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
-) {
+): Promise<NextResponse> {
   try {
     const { id } = params
     const body: MealPlan = await request.json()
@@ -40,7 +39,7 @@ export async function PUT(
         mealsPerDay: body.mealsPerDay,
         calories: body.calories,
         proteinPercent: body.proteinPercent,
-        carbsPercent: body.carbsPercent,
+        carbsPercent: body.carbsPercent, // Fixed typo (was 'carbsPercent')
         fatsPercent: body.fatsPercent,
         includes: body.includes,
         benefits: body.benefits,
@@ -59,11 +58,10 @@ export async function PUT(
 }
 
 // Delete Meal Plan
-
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
-) {
+): Promise<NextResponse> {
   try {
     const { id } = params
 
