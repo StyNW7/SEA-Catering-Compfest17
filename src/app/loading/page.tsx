@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function LoadingDemoPage() {
+
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Preparing your healthy meals...")
 
@@ -24,10 +25,11 @@ export default function LoadingDemoPage() {
     // Simulate loading completion
     setTimeout(() => {
       setIsLoading(false)
-    }, 5000)
+    }, 2000)
   }
 
   return (
+    
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-2xl mx-auto">
         <Card>
@@ -44,6 +46,8 @@ export default function LoadingDemoPage() {
       </div>
 
       <LoadingScreen isLoading={isLoading} message={loadingMessage} />
+
     </div>
+
   )
 }

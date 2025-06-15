@@ -550,7 +550,7 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center space-x-3">
                     <Mail className="h-5 w-5 text-emerald-600" />
-                    <span>hello@seacatering.id</span>
+                    <span>brian@seacatering.id</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <MapPin className="h-5 w-5 text-emerald-600" />
@@ -652,13 +652,13 @@ export default function HomePage() {
               </div>
               <p className="text-gray-400">Healthy Meals, Anytime, Anywhere</p>
               <div className="flex space-x-4">
-                <Button size="icon" variant="ghost" className="hover:bg-gray-800">
+                <Button size="icon" variant="ghost" className="hover:bg-gray-800 hover:text-white">
                   <Instagram className="h-4 w-4" />
                 </Button>
-                <Button size="icon" variant="ghost" className="hover:bg-gray-800">
+                <Button size="icon" variant="ghost" className="hover:bg-gray-800 hover:text-white">
                   <Facebook className="h-4 w-4" />
                 </Button>
-                <Button size="icon" variant="ghost" className="hover:bg-gray-800">
+                <Button size="icon" variant="ghost" className="hover:bg-gray-800 hover:text-white">
                   <Twitter className="h-4 w-4" />
                 </Button>
               </div>

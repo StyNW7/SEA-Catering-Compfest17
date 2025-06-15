@@ -6,12 +6,36 @@ import { ChefHat, Utensils, Heart, Leaf } from "lucide-react"
 interface LoadingScreenProps {
   isLoading?: boolean
   message?: string
+  key?: string | number  // Add key prop to force reset
 }
+
+type DotStyle = {
+  top: string
+  left: string
+  animationDelay: string
+  animationDuration: string
+}
+
 
 export default function LoadingScreen({
   isLoading = true,
   message = "Preparing your healthy meals...",
 }: LoadingScreenProps) {
+
+
+  const [dotStyles, setDotStyles] = useState<DotStyle[]>([])
+  
+  useEffect(() => {
+    const newStyles = Array.from({ length: 12 }).map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 3}s`,
+      animationDuration: `${2 + Math.random() * 3}s`,
+    }))
+    setDotStyles(newStyles)
+  }, [])
+
+  
   const [progress, setProgress] = useState(0)
   const [currentIcon, setCurrentIcon] = useState(0)
 
@@ -19,6 +43,9 @@ export default function LoadingScreen({
   const IconComponent = icons[currentIcon]
 
   useEffect(() => {
+    // Reset progress when isLoading changes
+    setProgress(0)
+    
     if (!isLoading) return
 
     const progressInterval = setInterval(() => {
@@ -27,7 +54,7 @@ export default function LoadingScreen({
           clearInterval(progressInterval)
           return 100
         }
-        return prev + Math.random() * 15
+        return prev + Math.random() * 25
       })
     }, 200)
 
@@ -51,17 +78,12 @@ export default function LoadingScreen({
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-200/20 dark:bg-orange-800/10 rounded-full blur-3xl animate-pulse delay-1000" />
 
         {/* Floating Particles */}
-        {[...Array(8)].map((_, i) => (
-          <div
+        {dotStyles.map((style, i) => (
+            <div
             key={i}
-            className={`absolute w-2 h-2 bg-emerald-300/50 dark:bg-emerald-600/30 rounded-full animate-ping`}
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-            }}
-          />
+            className="absolute w-3 h-3 bg-gradient-to-r from-emerald-300/50 to-orange-300/50 dark:from-emerald-600/30 dark:to-orange-600/30 rounded-full animate-ping"
+            style={style}
+            />
         ))}
       </div>
 

@@ -4,6 +4,9 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "@/context/AuthContext"
+import { Suspense } from "react"
+import LoadingWrapper from "@/components/utils/loading-wrapper"
+import RouteTransitionHandler from "@/components/utils/RouteTransitionHandler"
 
 // import { ThemeProvider } from "@/components/theme-provider"
 
@@ -25,8 +28,19 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
         {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange> */}
-          {children}
-          <Toaster/>
+        
+          <RouteTransitionHandler />
+          <Suspense fallback={
+            <LoadingWrapper>
+              <div /> {/* Empty fallback */}
+            </LoadingWrapper>
+          }>
+            <LoadingWrapper>
+              {children}
+              <Toaster/>
+            </LoadingWrapper>
+          </Suspense>
+          
         {/* </ThemeProvider> */}
         </AuthProvider>
       </body>
