@@ -12,31 +12,6 @@ export interface Testimonial {
   updatedAt?: string | Date
 }
 
-// export interface MealPlan {
-//   id: string
-//   name: string
-//   price: string
-//   originalPrice?: string
-//   description: string
-//   image: string
-//   category: "weight-loss" | "muscle-building" | "balanced" | "premium"
-//   popular?: boolean
-//   features: string[]
-//   additionalInfo: {
-//     duration: string
-//     mealsPerDay: number
-//     calories: string
-//     macros: {
-//       protein: string
-//       carbs: string
-//       fats: string
-//     }
-//     includes: string[]
-//     benefits: string[]
-//     sampleMeals: string[]
-//   }
-// }
-
 export interface MealPlan {
   id: string
   name: string
@@ -56,4 +31,36 @@ export interface MealPlan {
   includes: string[]
   benefits: string[]
   sampleMeals: string[]
+}
+
+export interface SubscriptionForm {
+  name: string
+  phone: string
+  plan: "diet" | "protein" | "royal" | ""
+  mealTypes: string[]
+  deliveryDays: string[]
+  allergies: string
+}
+
+export interface Subscription {
+  id: string
+  userId: string
+  planId: string
+  name: string
+  phone: string
+  mealTypes: string[]
+  deliveryDays: string[]
+  allergies?: string | null
+  totalPrice: number
+  startDate: Date
+  endDate?: Date | null
+  status: string
+  createdAt: Date
+  updatedAt: Date
+  mealPlan?: MealPlan
+  user?: {
+    id: string
+    name: string | null
+    email: string
+  }
 }

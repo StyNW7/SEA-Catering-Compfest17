@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum for user roles
+enum Role {
+  USER
+  ADMIN
+}
+
 // User model for authentication and authorization
 model User {
   id            String    @id @default(cuid())
@@ -21,33 +27,6 @@ model User {
   testimonials  Testimonial[]
   accounts      Account[] // For NextAuth.js to link with providers
 }
-
-// NextAuth.js Account model
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-// Enum for user roles
-enum Role {
-  USER
-  ADMIN
-}
-
 
 // MealPlan model
 model MealPlan {
@@ -78,7 +57,6 @@ model MealPlan {
 
 }
 
-
 // Subscription model
 model Subscription {
   id            String   @id @default(cuid())
@@ -86,15 +64,21 @@ model Subscription {
   user          User     @relation(fields: [userId], references: [id])
   planId        String
   mealPlan      MealPlan @relation(fields: [planId], references: [id])
-  mealTypes     String[] // e.g., ["Breakfast", "Lunch", "Dinner"]
-  deliveryDays  String[] // e.g., ["Monday", "Tuesday"]
+  name          String   // Customer name
+  phone         String   // Customer phone number
+  mealTypes     String[] // e.g., ["breakfast", "lunch", "dinner"]
+  deliveryDays  String[] // e.g., ["monday", "tuesday"]
   allergies     String?  @db.Text
   totalPrice    Float
   startDate     DateTime @default(now())
   endDate       DateTime? // Optional, for pausing or fixed-term subscriptions
-  status        String   @default("Active") // Active, Paused, Canceled
+  status        String   @default("active") // active, paused, canceled
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
 }
 
 // Testimonial model
@@ -116,3 +100,28 @@ model Testimonial {
   user        User?    @relation(fields: [customerId], references: [id])
 
 }
+
+
+
+
+// NextAuth.js Account model
+/*
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+*/

@@ -1,88 +1,153 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import {prisma} from '@/lib/prisma';
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
-interface Params {
-  id: string;
+// Get single subscription
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params
+
+    const subscription = await prisma.subscription.findUnique({
+      where: { id },
+      include: {
+        mealPlan: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    })
+
+    if (!subscription) {
+      return NextResponse.json(
+        { error: 'Subscription not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json(subscription)
+  } catch (error) {
+    console.error('Error fetching subscription:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch subscription' },
+      { status: 500 }
+    )
+  }
 }
 
-// PUT: Update a subscription (e.g., pause/resume)
-export async function PUT(request: Request, { params }: { params: Params }) {
-  const session = await auth();
-  const subscriptionId = params.id;
-
-  if (!session || !session.user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-  }
+// Update subscription
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
 
   try {
-    const body = await request.json();
-    const { status, endDate } = body; // Example: { status: "Paused", endDate: "2025-07-31T00:00:00Z" }
+    const { id } = params
+    const body = await request.json()
 
-    // Find the subscription to ensure it belongs to the user or if user is admin
+    // Verify subscription exists
     const existingSubscription = await prisma.subscription.findUnique({
-      where: { id: subscriptionId },
-    });
+      where: { id }
+    })
 
     if (!existingSubscription) {
-      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Subscription not found' },
+        { status: 404 }
+      )
     }
 
-    // Authorization check: User can only update their own subscriptions, Admin can update any.
-    if (existingSubscription.userId !== session.user.id && session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Forbidden: You do not have permission to update this subscription' }, { status: 403 });
+    // Calculate new total price if meal types or delivery days changed
+    let totalPrice = existingSubscription.totalPrice
+    if (body.mealTypes || body.deliveryDays) {
+      const mealTypes = body.mealTypes || existingSubscription.mealTypes
+      const deliveryDays = body.deliveryDays || existingSubscription.deliveryDays
+      totalPrice = await calculateTotalPrice(existingSubscription.planId, mealTypes, deliveryDays)
     }
 
+    // Update subscription
     const updatedSubscription = await prisma.subscription.update({
-      where: { id: subscriptionId },
+      where: { id },
       data: {
-        status: status,
-        endDate: endDate ? new Date(endDate) : null, // Set endDate for pause
-      },
-    });
+        name: body.name || existingSubscription.name,
+        phone: body.phone || existingSubscription.phone,
+        mealTypes: body.mealTypes || existingSubscription.mealTypes,
+        deliveryDays: body.deliveryDays || existingSubscription.deliveryDays,
+        allergies: body.allergies ?? existingSubscription.allergies,
+        totalPrice,
+        status: body.status || existingSubscription.status,
+        endDate: body.endDate || existingSubscription.endDate
+      }
+    })
 
-    return NextResponse.json({ message: 'Subscription updated successfully', data: updatedSubscription }, { status: 200 });
+    return NextResponse.json(updatedSubscription)
   } catch (error) {
-    console.error(`Error updating subscription ${subscriptionId}:`, error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error updating subscription:', error)
+    return NextResponse.json(
+      { error: 'Failed to update subscription' },
+      { status: 500 }
+    )
   }
 }
 
-// DELETE: Cancel a subscription
-export async function DELETE(request: Request, { params }: { params: Params }) {
-  const session = await auth();
-  const subscriptionId = params.id;
-
-  if (!session || !session.user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-  }
-
+// Delete subscription
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    // Find the subscription to ensure it belongs to the user or if user is admin
+
+    const { id } = params
+
+    // Verify subscription exists
     const existingSubscription = await prisma.subscription.findUnique({
-      where: { id: subscriptionId },
-    });
+      where: { id }
+    })
 
     if (!existingSubscription) {
-      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Subscription not found' },
+        { status: 404 }
+      )
     }
 
-    // Authorization check: User can only cancel their own subscriptions, Admin can cancel any.
-    if (existingSubscription.userId !== session.user.id && session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Forbidden: You do not have permission to cancel this subscription' }, { status: 403 });
-    }
+    // Delete subscription
+    await prisma.subscription.delete({
+      where: { id }
+    })
 
-    await prisma.subscription.update({
-      where: { id: subscriptionId },
-      data: {
-        status: 'Canceled',
-        endDate: new Date(), // Set end date to now when canceled
-      },
-    });
-
-    return NextResponse.json({ message: 'Subscription cancelled successfully' }, { status: 200 });
+    return NextResponse.json(
+      { message: 'Subscription deleted successfully' },
+      { status: 200 }
+    )
   } catch (error) {
-    console.error(`Error cancelling subscription ${subscriptionId}:`, error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error deleting subscription:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete subscription' },
+      { status: 500 }
+    )
   }
+}
+
+// Reusable calculateTotalPrice function
+async function calculateTotalPrice(planId: string, mealTypes: string[], deliveryDays: string[]): Promise<number> {
+  const mealPlan = await prisma.mealPlan.findUnique({
+    where: { id: planId }
+  })
+
+  if (!mealPlan) {
+    throw new Error('Meal plan not found')
+  }
+
+  const pricePerMeal = parseFloat(mealPlan.price)
+  const mealsPerDay = mealTypes.length
+  const daysPerWeek = deliveryDays.length
+  const weeksInMonth = 4.3
+  
+  return pricePerMeal * mealsPerDay * daysPerWeek * weeksInMonth
 }

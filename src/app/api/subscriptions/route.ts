@@ -1,69 +1,120 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth'; // Your NextAuth.js configuration
-import {prisma} from '@/lib/prisma';
-import { subscriptionSchema } from '@/lib/zod-schemas';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { SubscriptionForm } from '@/types/index'
+import { getServerSession } from '@/lib/session'
 
-// POST: Create a new subscription
-export async function POST(request: Request) {
-  const session = await auth(); // Get session on the server
+// Helper function to calculate total price
+async function calculateTotalPrice(planId: string, mealTypes: string[], deliveryDays: string[]): Promise<number> {
 
-  if (!session || !session.user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const mealPlan = await prisma.mealPlan.findUnique({
+    where: { id: planId }
+  })
+
+  if (!mealPlan) {
+    throw new Error('Meal plan not found')
   }
 
+  const pricePerMeal = parseFloat(mealPlan.price)
+  const mealsPerDay = mealTypes.length
+  const daysPerWeek = deliveryDays.length
+  const weeksInMonth = 4.3
+  
+  return pricePerMeal * mealsPerDay * daysPerWeek * weeksInMonth
+
+}
+
+// Create Subscription
+export async function POST(request: Request) {
+
   try {
-    const body = await request.json();
-    // Ensure totalPrice is passed from the frontend calculation
-    const { name, phoneNumber, planId, mealTypes, deliveryDays, allergies, totalPrice } = body;
 
-    const validatedData = subscriptionSchema.safeParse({
-      name, phoneNumber, planId, mealTypes, deliveryDays, allergies
-    });
+    const session = await getServerSession();
+    const body: SubscriptionForm = await request.json()
 
-    if (!validatedData.success) {
-      return NextResponse.json({ error: 'Validation failed', details: validatedData.error.flatten().fieldErrors }, { status: 400 });
+    // Validate required fields
+    if (!body.name || !body.phone || !body.plan || !body.mealTypes?.length || !body.deliveryDays?.length) {
+      return NextResponse.json(
+        { error: 'Name, phone, plan, meal types, and delivery days are required' },
+        { status: 400 }
+      )
     }
 
-    const newSubscription = await prisma.subscription.create({
+    // Find the meal plan
+    const mealPlan = await prisma.mealPlan.findFirst({
+      where: { category: body.plan }
+    })
+
+    if (!mealPlan) {
+      return NextResponse.json(
+        { error: 'Selected meal plan not found' },
+        { status: 404 }
+      )
+    }
+
+    // Calculate total price
+    const totalPrice = await calculateTotalPrice(mealPlan.id, body.mealTypes, body.deliveryDays)
+
+    // Create subscription
+    const subscription = await prisma.subscription.create({
       data: {
-        userId: session.user.id,
-        planId: validatedData.data.planId,
-        mealTypes: validatedData.data.mealTypes,
-        deliveryDays: validatedData.data.deliveryDays,
-        allergies: validatedData.data.allergies,
-        totalPrice: totalPrice, // Use the calculated total price
-      },
-    });
+        ...(session?.user?.id && { userId: session.user.id }),
+        planId: mealPlan.id,
+        name: body.name,
+        phone: body.phone,
+        mealTypes: body.mealTypes,
+        deliveryDays: body.deliveryDays,
+        allergies: body.allergies,
+        totalPrice: totalPrice,
+        status: 'active'
+      }
+    })
 
-    return NextResponse.json({ message: 'Subscription created successfully', data: newSubscription }, { status: 201 });
+    return NextResponse.json(subscription, { status: 201 })
   } catch (error) {
-    console.error('Subscription creation API error:', error);
-    if (error instanceof PrismaClientKnownRequestError) {
-      // Handle specific Prisma errors if necessary
-      return NextResponse.json({ error: `Database error: ${error.message}` }, { status: 500 });
-    }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error creating subscription:', error)
+    return NextResponse.json(
+      { error: 'Failed to create subscription' },
+      { status: 500 }
+    )
   }
 }
 
-// GET: Get all subscriptions for the authenticated user
-export async function GET() {
-  const session = await auth();
-
-  if (!session || !session.user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-  }
-
+// Get all subscriptions
+export async function GET(request: Request) {
   try {
-    const userSubscriptions = await prisma.subscription.findMany({
-      where: { userId: session.user.id },
-      include: { mealPlan: true }, // Include meal plan details
-      orderBy: { createdAt: 'desc' },
-    });
-    return NextResponse.json({ data: userSubscriptions }, { status: 200 });
+    
+    const { searchParams } = new URL(request.url)
+    const userId = searchParams.get('userId')
+    const status = searchParams.get('status')
+
+    const where: any = {}
+    if (userId) where.userId = userId
+    if (status) where.status = status
+
+    const subscriptions = await prisma.subscription.findMany({
+      where,
+      include: {
+        mealPlan: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+
+    return NextResponse.json(subscriptions)
   } catch (error) {
-    console.error('Failed to fetch user subscriptions:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error fetching subscriptions:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch subscriptions' },
+      { status: 500 }
+    )
   }
 }

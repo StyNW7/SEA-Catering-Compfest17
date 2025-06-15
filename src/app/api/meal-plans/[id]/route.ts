@@ -36,15 +36,15 @@ export async function PUT(
         category: body.category,
         popular: body.popular,
         features: body.features,
-        duration: body.additionalInfo.duration,
-        mealsPerDay: body.additionalInfo.mealsPerDay,
-        calories: body.additionalInfo.calories,
-        proteinPercent: body.additionalInfo.macros.protein,
-        carbsPercent: body.additionalInfo.macros.carbs,
-        fatsPercent: body.additionalInfo.macros.fats,
-        includes: body.additionalInfo.includes,
-        benefits: body.additionalInfo.benefits,
-        sampleMeals: body.additionalInfo.sampleMeals
+        duration: body.duration,
+        mealsPerDay: body.mealsPerDay,
+        calories: body.calories,
+        proteinPercent: body.proteinPercent,
+        carbsPercent: body.carbsPercent,
+        fatsPercent: body.fatsPercent,
+        includes: body.includes,
+        benefits: body.benefits,
+        sampleMeals: body.sampleMeals
       }
     })
 
