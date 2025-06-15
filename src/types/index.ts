@@ -34,6 +34,7 @@ export interface MealPlan {
 }
 
 export interface SubscriptionForm {
+  totalprice: number
   name: string
   phone: string
   plan: "diet" | "protein" | "royal" | ""

@@ -168,7 +168,9 @@ export default function TestimonialsPage() {
       await new Promise((resolve) => setTimeout(resolve, 500))
       setIsSubmitting(false)
       location.reload()
+      
     }
+
   }
 
   const renderStars = (rating: number, size: "sm" | "md" | "lg" = "sm") => {
@@ -346,12 +348,9 @@ export default function TestimonialsPage() {
                         <SelectValue placeholder="Select your meal plan" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Weight Loss Starter">Weight Loss Starter</SelectItem>
-                        <SelectItem value="Muscle Building Pro">Muscle Building Pro</SelectItem>
-                        <SelectItem value="Balanced Family Plan">Balanced Family Plan</SelectItem>
-                        <SelectItem value="Premium Gourmet">Premium Gourmet</SelectItem>
-                        <SelectItem value="Keto Advanced">Keto Advanced</SelectItem>
-                        <SelectItem value="Vegan Power Plan">Vegan Power Plan</SelectItem>
+                        <SelectItem value="Diet Plan">Diet Plan</SelectItem>
+                        <SelectItem value="Protein Plan">Protein Plan</SelectItem>
+                        <SelectItem value="Royal Plan">Royal Plan</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
     // Find the meal plan
     const mealPlan = await prisma.mealPlan.findFirst({
-      where: { category: body.plan }
+      where: { name: body.plan }
     })
 
     if (!mealPlan) {

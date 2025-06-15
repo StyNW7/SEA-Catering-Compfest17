@@ -107,8 +107,8 @@ async function main() {
         name: "Sarah Johnson",
         location: "New York",
         rating: 5,
-        message: "The Balanced Lifestyle Plan has completely changed my eating habits. I have more energy and feel great!",
-        plan: "Balanced Lifestyle Plan",
+        message: "The Diet Plan has completely changed my eating habits. I have more energy and feel great!",
+        plan: "Diet Plan",
         verified: true,
         avatar: "/images/testimonials/sarah.jpg"
       },
@@ -117,7 +117,7 @@ async function main() {
         location: "San Francisco",
         rating: 4,
         message: "Lost 12 pounds in the first month with the Weight Loss Program. The meals are delicious and filling!",
-        plan: "Weight Loss Program",
+        plan: "Protein Plan",
         verified: true,
         customerId: regularUser.id
       },
@@ -125,8 +125,8 @@ async function main() {
         name: "David Wilson",
         location: "Chicago",
         rating: 5,
-        message: "As a fitness enthusiast, the Muscle Building Plan provides exactly what I need for my training regimen.",
-        plan: "Muscle Building Plan",
+        message: "As a fitness enthusiast, the Protein Plan provides exactly what I need for my training regimen.",
+        plan: "Protein Plan",
         verified: false
       },
       {
@@ -134,7 +134,7 @@ async function main() {
         location: "Miami",
         rating: 5,
         message: "The Premium Gourmet Plan is worth every penny. It's like having a personal chef without the hassle!",
-        plan: "Premium Gourmet Plan",
+        plan: "Royal Plan",
         verified: true,
         avatar: "/images/testimonials/emily.jpg"
       },
@@ -143,7 +143,7 @@ async function main() {
         location: "Seattle",
         rating: 4,
         message: "Great variety and quality. The convenience of having healthy meals delivered is a game-changer.",
-        plan: "Balanced Lifestyle Plan",
+        plan: "Diet Plan",
         verified: true
       }
     ],

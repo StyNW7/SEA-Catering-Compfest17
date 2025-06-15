@@ -32,6 +32,7 @@ import { Navbar } from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 interface SubscriptionForm {
   name: string
@@ -44,7 +45,7 @@ interface SubscriptionForm {
 
 const plans = [
   {
-    id: "diet",
+    id: "Diet Plan",
     name: "Diet Plan",
     price: 30000,
     description: "Perfect for weight management with balanced nutrition",
@@ -53,7 +54,7 @@ const plans = [
     color: "emerald",
   },
   {
-    id: "protein",
+    id: "Protein Plan",
     name: "Protein Plan",
     price: 40000,
     description: "High-protein meals for fitness enthusiasts",
@@ -63,7 +64,7 @@ const plans = [
     popular: true,
   },
   {
-    id: "royal",
+    id: "Royal Plan",
     name: "Royal Plan",
     price: 60000,
     description: "Premium gourmet experience with luxury ingredients",
@@ -91,11 +92,12 @@ const deliveryDays = [
 
 export default function SubscriptionPage() {
 
-  const {user} = useAuth();
-
+  const { user } = useAuth()
+  const router = useRouter()
+  
   const [isLoaded, setIsLoaded] = useState(false)
   const [formData, setFormData] = useState<SubscriptionForm>({
-    name: "",
+    name: user?.name || "",
     phone: "",
     plan: "",
     mealTypes: [],
@@ -105,9 +107,19 @@ export default function SubscriptionPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Redirect if not authenticated
   useEffect(() => {
-    setIsLoaded(true)
-  }, [])
+    if (!user) {
+      router.push("/auth/login?redirect=/subscribe")
+    } else {
+      // Pre-fill name if available from user
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || ""
+      }))
+      setIsLoaded(true)
+    }
+  }, [user, router])
 
   const calculateTotalPrice = () => {
     if (!formData.plan || formData.mealTypes.length === 0 || formData.deliveryDays.length === 0) {
@@ -120,9 +132,9 @@ export default function SubscriptionPage() {
     const planPrice = selectedPlan.price
     const mealTypesCount = formData.mealTypes.length
     const deliveryDaysCount = formData.deliveryDays.length
-    const multiplier = 4.3
+    const weeksInMonth = 4.3 // Average weeks in a month
 
-    return planPrice * mealTypesCount * deliveryDaysCount * multiplier
+    return planPrice * mealTypesCount * deliveryDaysCount * weeksInMonth
   }
 
   const formatPrice = (price: number) => {
@@ -171,59 +183,98 @@ export default function SubscriptionPage() {
 
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // ...(user && { 'Authorization': `Bearer cmbxep9a90001vfl45r3vo390` })
+        },
+        body: JSON.stringify({
+          ...formData,
+        }),
+      })
 
-    setIsSubmitting(false)
-    alert(
-      `Subscription created successfully!\nTotal: ${formatPrice(calculateTotalPrice())}\nThank you for choosing SEA Catering!`,
-    )
+      const data = await response.json()
 
-    // Reset form
-    setFormData({
-      name: "",
-      phone: "",
-      plan: "",
-      mealTypes: [],
-      deliveryDays: [],
-      allergies: "",
-    })
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to subscribe')
+      }
+
+      toast.success("Subscription Created", {
+        description: 'Your meal plan subscription has been successfully created!',
+        action: {
+          label: 'View Dashboard',
+          onClick: () => router.push('/dashboard')
+        }
+      })
+
+      // Reset form
+      setFormData({
+        name: user?.name || "",
+        phone: "",
+        plan: "",
+        mealTypes: [],
+        deliveryDays: [],
+        allergies: "",
+      })
+
+    } catch {
+      toast.error("Subscription Failed", {
+        description: 'Failed to create subscription. Please try again.',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleMealTypeChange = (mealType: string, checked: boolean) => {
     if (checked) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         mealTypes: [...prev.mealTypes, mealType],
       }))
     } else {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         mealTypes: prev.mealTypes.filter((type) => type !== mealType),
       }))
+    }
+    if (errors.mealTypes) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors.mealTypes
+        return newErrors
+      })
     }
   }
 
   const handleDeliveryDayChange = (day: string, checked: boolean) => {
     if (checked) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         deliveryDays: [...prev.deliveryDays, day],
       }))
     } else {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         deliveryDays: prev.deliveryDays.filter((d) => d !== day),
       }))
+    }
+    if (errors.deliveryDays) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors.deliveryDays
+        return newErrors
+      })
     }
   }
 
   const totalPrice = calculateTotalPrice()
 
-  const router = useRouter()
-  if (user == null){
-    router.push("/auth/login")
-  }
+  // if (!isLoaded) {
+  //   return <div>Loading...</div>
+  // }
 
   return (
 
