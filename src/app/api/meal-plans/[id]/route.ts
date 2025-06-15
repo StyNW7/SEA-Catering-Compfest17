@@ -5,10 +5,11 @@ import { MealPlan } from '@/types/index'
 // Update Meal Plan
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
-    const { id } = params
+
+    const id = (await params).id; 
     const body: MealPlan = await request.json()
 
     // Verify meal plan exists
@@ -60,10 +61,11 @@ export async function PUT(
 // Delete Meal Plan
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
-    const { id } = params
+    
+    const id = (await params).id; 
 
     // Verify meal plan exists
     const existingMealPlan = await prisma.mealPlan.findUnique({
