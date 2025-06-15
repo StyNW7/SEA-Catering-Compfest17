@@ -33,169 +33,147 @@ import {
 import Image from "next/image"
 import { Navbar } from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
+import { toast } from "sonner"
+import { MealPlan } from "@/types"
+import Link from "next/link"
 
-interface MealPlan {
-  id: string
-  name: string
-  price: string
-  originalPrice?: string
-  description: string
-  image: string
-  category: "weight-loss" | "muscle-building" | "balanced" | "premium"
-  popular?: boolean
-  features: string[]
-  additionalInfo: {
-    duration: string
-    mealsPerDay: number
-    calories: string
-    macros: {
-      protein: string
-      carbs: string
-      fats: string
-    }
-    includes: string[]
-    benefits: string[]
-    sampleMeals: string[]
-  }
-}
-
-const mealPlans: MealPlan[] = [
-  {
-    id: "weight-loss-basic",
-    name: "Weight Loss Starter",
-    price: "Rp 150,000",
-    originalPrice: "Rp 180,000",
-    description:
-      "Perfect for beginners looking to start their weight loss journey with portion-controlled, nutritious meals.",
-    image: "/placeholder.svg?height=300&width=400",
-    category: "weight-loss",
-    features: ["Calorie controlled", "High protein", "Low carb options", "Nutritionist approved"],
-    additionalInfo: {
-      duration: "7 days minimum",
-      mealsPerDay: 3,
-      calories: "1200-1400 per day",
-      macros: {
-        protein: "35%",
-        carbs: "30%",
-        fats: "35%",
-      },
-      includes: ["Breakfast", "Lunch", "Dinner", "Nutrition guide", "Progress tracking"],
-      benefits: ["Sustainable weight loss", "Improved metabolism", "Better energy levels", "Reduced cravings"],
-      sampleMeals: ["Grilled chicken salad", "Quinoa bowl with vegetables", "Baked salmon with asparagus"],
-    },
-  },
-  {
-    id: "muscle-building-pro",
-    name: "Muscle Building Pro",
-    price: "Rp 200,000",
-    description: "High-protein meals designed for athletes and fitness enthusiasts looking to build lean muscle mass.",
-    image: "/placeholder.svg?height=300&width=400",
-    category: "muscle-building",
-    popular: true,
-    features: ["High protein content", "Post-workout meals", "Balanced macros", "Performance focused"],
-    additionalInfo: {
-      duration: "14 days minimum",
-      mealsPerDay: 4,
-      calories: "2200-2500 per day",
-      macros: {
-        protein: "40%",
-        carbs: "35%",
-        fats: "25%",
-      },
-      includes: ["4 meals daily", "Pre/post workout snacks", "Protein supplements", "Training nutrition guide"],
-      benefits: ["Muscle growth", "Faster recovery", "Increased strength", "Better performance"],
-      sampleMeals: ["Protein-packed breakfast bowl", "Lean beef with sweet potato", "Greek yogurt parfait"],
-    },
-  },
-  {
-    id: "balanced-family",
-    name: "Balanced Family Plan",
-    price: "Rp 120,000",
-    description: "Well-rounded meals perfect for families who want to maintain a healthy lifestyle together.",
-    image: "/placeholder.svg?height=300&width=400",
-    category: "balanced",
-    features: ["Variety of cuisines", "Balanced nutrition", "Family friendly", "Flexible portions"],
-    additionalInfo: {
-      duration: "7 days minimum",
-      mealsPerDay: 3,
-      calories: "1800-2000 per day",
-      macros: {
-        protein: "25%",
-        carbs: "45%",
-        fats: "30%",
-      },
-      includes: ["Family-sized portions", "Kid-friendly options", "Variety menu", "Meal planning guide"],
-      benefits: ["Balanced nutrition", "Family bonding", "Convenient meals", "Healthy habits"],
-      sampleMeals: ["Indonesian gado-gado", "Grilled fish with rice", "Vegetable stir-fry"],
-    },
-  },
-  {
-    id: "premium-gourmet",
-    name: "Premium Gourmet",
-    price: "Rp 300,000",
-    description: "Luxury dining experience with chef-crafted gourmet meals using premium ingredients.",
-    image: "/placeholder.svg?height=300&width=400",
-    category: "premium",
-    features: ["Premium ingredients", "Chef-crafted", "Gourmet experience", "Exclusive recipes"],
-    additionalInfo: {
-      duration: "3 days minimum",
-      mealsPerDay: 3,
-      calories: "2000-2200 per day",
-      macros: {
-        protein: "30%",
-        carbs: "40%",
-        fats: "30%",
-      },
-      includes: ["Premium ingredients", "Chef presentation", "Wine pairing suggestions", "Exclusive recipes"],
-      benefits: ["Gourmet experience", "Premium quality", "Unique flavors", "Restaurant-quality"],
-      sampleMeals: ["Wagyu beef tenderloin", "Lobster thermidor", "Truffle risotto"],
-    },
-  },
-  {
-    id: "keto-advanced",
-    name: "Keto Advanced",
-    price: "Rp 180,000",
-    description: "Strict ketogenic diet plan for those committed to achieving and maintaining ketosis.",
-    image: "/placeholder.svg?height=300&width=400",
-    category: "weight-loss",
-    features: ["Ultra low carb", "High healthy fats", "Ketosis support", "Expert guidance"],
-    additionalInfo: {
-      duration: "14 days minimum",
-      mealsPerDay: 3,
-      calories: "1600-1800 per day",
-      macros: {
-        protein: "25%",
-        carbs: "5%",
-        fats: "70%",
-      },
-      includes: ["Keto-friendly meals", "MCT oil supplements", "Ketone testing strips", "Keto guide"],
-      benefits: ["Rapid fat loss", "Mental clarity", "Stable energy", "Appetite control"],
-      sampleMeals: ["Avocado egg bowl", "Salmon with cauliflower", "Coconut curry chicken"],
-    },
-  },
-  {
-    id: "vegan-power",
-    name: "Vegan Power Plan",
-    price: "Rp 140,000",
-    description: "Plant-based nutrition packed with protein and essential nutrients for optimal health.",
-    image: "/placeholder.svg?height=300&width=400",
-    category: "balanced",
-    features: ["100% plant-based", "High protein", "Nutrient dense", "Environmentally friendly"],
-    additionalInfo: {
-      duration: "7 days minimum",
-      mealsPerDay: 3,
-      calories: "1800-2000 per day",
-      macros: {
-        protein: "20%",
-        carbs: "55%",
-        fats: "25%",
-      },
-      includes: ["Plant-based proteins", "Superfood ingredients", "B12 supplements", "Vegan nutrition guide"],
-      benefits: ["Improved digestion", "Lower inflammation", "Environmental impact", "Ethical eating"],
-      sampleMeals: ["Quinoa Buddha bowl", "Lentil curry", "Chickpea protein salad"],
-    },
-  },
-]
+// const mealPlans: MealPlan[] = [
+//   {
+//     id: "weight-loss-basic",
+//     name: "Weight Loss Starter",
+//     price: "Rp 150,000",
+//     originalPrice: "Rp 180,000",
+//     description:
+//       "Perfect for beginners looking to start their weight loss journey with portion-controlled, nutritious meals.",
+//     image: "/placeholder.svg?height=300&width=400",
+//     category: "weight-loss",
+//     features: ["Calorie controlled", "High protein", "Low carb options", "Nutritionist approved"],
+//     additionalInfo: {
+//       duration: "7 days minimum",
+//       mealsPerDay: 3,
+//       calories: "1200-1400 per day",
+//       macros: {
+//         protein: "35%",
+//         carbs: "30%",
+//         fats: "35%",
+//       },
+//       includes: ["Breakfast", "Lunch", "Dinner", "Nutrition guide", "Progress tracking"],
+//       benefits: ["Sustainable weight loss", "Improved metabolism", "Better energy levels", "Reduced cravings"],
+//       sampleMeals: ["Grilled chicken salad", "Quinoa bowl with vegetables", "Baked salmon with asparagus"],
+//     },
+//   },
+//   {
+//     id: "muscle-building-pro",
+//     name: "Muscle Building Pro",
+//     price: "Rp 200,000",
+//     description: "High-protein meals designed for athletes and fitness enthusiasts looking to build lean muscle mass.",
+//     image: "/placeholder.svg?height=300&width=400",
+//     category: "muscle-building",
+//     popular: true,
+//     features: ["High protein content", "Post-workout meals", "Balanced macros", "Performance focused"],
+//     additionalInfo: {
+//       duration: "14 days minimum",
+//       mealsPerDay: 4,
+//       calories: "2200-2500 per day",
+//       macros: {
+//         protein: "40%",
+//         carbs: "35%",
+//         fats: "25%",
+//       },
+//       includes: ["4 meals daily", "Pre/post workout snacks", "Protein supplements", "Training nutrition guide"],
+//       benefits: ["Muscle growth", "Faster recovery", "Increased strength", "Better performance"],
+//       sampleMeals: ["Protein-packed breakfast bowl", "Lean beef with sweet potato", "Greek yogurt parfait"],
+//     },
+//   },
+//   {
+//     id: "balanced-family",
+//     name: "Balanced Family Plan",
+//     price: "Rp 120,000",
+//     description: "Well-rounded meals perfect for families who want to maintain a healthy lifestyle together.",
+//     image: "/placeholder.svg?height=300&width=400",
+//     category: "balanced",
+//     features: ["Variety of cuisines", "Balanced nutrition", "Family friendly", "Flexible portions"],
+//     additionalInfo: {
+//       duration: "7 days minimum",
+//       mealsPerDay: 3,
+//       calories: "1800-2000 per day",
+//       macros: {
+//         protein: "25%",
+//         carbs: "45%",
+//         fats: "30%",
+//       },
+//       includes: ["Family-sized portions", "Kid-friendly options", "Variety menu", "Meal planning guide"],
+//       benefits: ["Balanced nutrition", "Family bonding", "Convenient meals", "Healthy habits"],
+//       sampleMeals: ["Indonesian gado-gado", "Grilled fish with rice", "Vegetable stir-fry"],
+//     },
+//   },
+//   {
+//     id: "premium-gourmet",
+//     name: "Premium Gourmet",
+//     price: "Rp 300,000",
+//     description: "Luxury dining experience with chef-crafted gourmet meals using premium ingredients.",
+//     image: "/placeholder.svg?height=300&width=400",
+//     category: "premium",
+//     features: ["Premium ingredients", "Chef-crafted", "Gourmet experience", "Exclusive recipes"],
+//     additionalInfo: {
+//       duration: "3 days minimum",
+//       mealsPerDay: 3,
+//       calories: "2000-2200 per day",
+//       macros: {
+//         protein: "30%",
+//         carbs: "40%",
+//         fats: "30%",
+//       },
+//       includes: ["Premium ingredients", "Chef presentation", "Wine pairing suggestions", "Exclusive recipes"],
+//       benefits: ["Gourmet experience", "Premium quality", "Unique flavors", "Restaurant-quality"],
+//       sampleMeals: ["Wagyu beef tenderloin", "Lobster thermidor", "Truffle risotto"],
+//     },
+//   },
+//   {
+//     id: "keto-advanced",
+//     name: "Keto Advanced",
+//     price: "Rp 180,000",
+//     description: "Strict ketogenic diet plan for those committed to achieving and maintaining ketosis.",
+//     image: "/placeholder.svg?height=300&width=400",
+//     category: "weight-loss",
+//     features: ["Ultra low carb", "High healthy fats", "Ketosis support", "Expert guidance"],
+//     additionalInfo: {
+//       duration: "14 days minimum",
+//       mealsPerDay: 3,
+//       calories: "1600-1800 per day",
+//       macros: {
+//         protein: "25%",
+//         carbs: "5%",
+//         fats: "70%",
+//       },
+//       includes: ["Keto-friendly meals", "MCT oil supplements", "Ketone testing strips", "Keto guide"],
+//       benefits: ["Rapid fat loss", "Mental clarity", "Stable energy", "Appetite control"],
+//       sampleMeals: ["Avocado egg bowl", "Salmon with cauliflower", "Coconut curry chicken"],
+//     },
+//   },
+//   {
+//     id: "vegan-power",
+//     name: "Vegan Power Plan",
+//     price: "Rp 140,000",
+//     description: "Plant-based nutrition packed with protein and essential nutrients for optimal health.",
+//     image: "/placeholder.svg?height=300&width=400",
+//     category: "balanced",
+//     features: ["100% plant-based", "High protein", "Nutrient dense", "Environmentally friendly"],
+//     additionalInfo: {
+//       duration: "7 days minimum",
+//       mealsPerDay: 3,
+//       calories: "1800-2000 per day",
+//       macros: {
+//         protein: "20%",
+//         carbs: "55%",
+//         fats: "25%",
+//       },
+//       includes: ["Plant-based proteins", "Superfood ingredients", "B12 supplements", "Vegan nutrition guide"],
+//       benefits: ["Improved digestion", "Lower inflammation", "Environmental impact", "Ethical eating"],
+//       sampleMeals: ["Quinoa Buddha bowl", "Lentil curry", "Chickpea protein salad"],
+//     },
+//   },
+// ]
 
 const categories = [
   { id: "all", name: "All Plans", icon: ChefHat },
@@ -206,9 +184,31 @@ const categories = [
 ]
 
 export default function MealPlansPage() {
+
+  const [mealPlans, setMealPlans] = useState<MealPlan[]>([])
+  const [, setLoading] = useState(true)
   
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    const fetchMealPlans = async () => {
+      try {
+        const response = await fetch('/api/meal-plans')
+        if (!response.ok) throw new Error('Failed to fetch meal plans')
+        const data = await response.json()
+        setMealPlans(data)
+      } catch {
+        toast('Error',{
+          description: 'Failed to load meal plans',
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchMealPlans()
+  }, [])
 
   useEffect(() => {
     setIsLoaded(true)
@@ -414,19 +414,19 @@ export default function MealPlansPage() {
                                 </div>
                                 <div className="text-right text-sm text-muted-foreground">
                                   <div>per day</div>
-                                  <div>{plan.additionalInfo.duration}</div>
+                                  <div>{plan.duration}</div>
                                 </div>
                               </div>
 
                               <div className="grid grid-cols-2 gap-4">
                                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                                   <Clock className="h-5 w-5 text-emerald-600 mx-auto mb-1" />
-                                  <div className="font-semibold">{plan.additionalInfo.mealsPerDay}</div>
+                                  <div className="font-semibold">{plan.mealsPerDay}</div>
                                   <div className="text-xs text-muted-foreground">Meals/Day</div>
                                 </div>
                                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                                   <Zap className="h-5 w-5 text-emerald-600 mx-auto mb-1" />
-                                  <div className="font-semibold">{plan.additionalInfo.calories}</div>
+                                  <div className="font-semibold">{plan.calories}</div>
                                   <div className="text-xs text-muted-foreground">Calories</div>
                                 </div>
                               </div>
@@ -449,7 +449,7 @@ export default function MealPlansPage() {
                                     What&apos;s Included
                                   </h4>
                                   <ul className="space-y-1">
-                                    {plan.additionalInfo.includes.map((item, index) => (
+                                    {plan.includes.map((item, index) => (
                                       <li key={index} className="flex items-center space-x-2 text-sm">
                                         <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full" />
                                         <span>{item}</span>
@@ -466,15 +466,15 @@ export default function MealPlansPage() {
                                   <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
                                       <span>Duration:</span>
-                                      <span className="font-medium">{plan.additionalInfo.duration}</span>
+                                      <span className="font-medium">{plan.duration}</span>
                                     </div>
                                     <div className="flex justify-between">
                                       <span>Meals per day:</span>
-                                      <span className="font-medium">{plan.additionalInfo.mealsPerDay}</span>
+                                      <span className="font-medium">{plan.mealsPerDay}</span>
                                     </div>
                                     <div className="flex justify-between">
                                       <span>Daily calories:</span>
-                                      <span className="font-medium">{plan.additionalInfo.calories}</span>
+                                      <span className="font-medium">{plan.calories}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -493,11 +493,11 @@ export default function MealPlansPage() {
                                         <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
                                           <div
                                             className="h-full bg-emerald-500 rounded-full"
-                                            style={{ width: plan.additionalInfo.macros.protein }}
+                                            style={{ width: plan.proteinPercent }}
                                           />
                                         </div>
                                         <span className="text-sm font-medium">
-                                          {plan.additionalInfo.macros.protein}
+                                          {plan.proteinPercent}
                                         </span>
                                       </div>
                                     </div>
@@ -507,10 +507,10 @@ export default function MealPlansPage() {
                                         <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
                                           <div
                                             className="h-full bg-orange-500 rounded-full"
-                                            style={{ width: plan.additionalInfo.macros.carbs }}
+                                            style={{ width: plan.carbsPercent }}
                                           />
                                         </div>
-                                        <span className="text-sm font-medium">{plan.additionalInfo.macros.carbs}</span>
+                                        <span className="text-sm font-medium">{plan.carbsPercent}</span>
                                       </div>
                                     </div>
                                     <div className="flex items-center justify-between">
@@ -519,10 +519,10 @@ export default function MealPlansPage() {
                                         <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
                                           <div
                                             className="h-full bg-blue-500 rounded-full"
-                                            style={{ width: plan.additionalInfo.macros.fats }}
+                                            style={{ width: plan.fatsPercent }}
                                           />
                                         </div>
-                                        <span className="text-sm font-medium">{plan.additionalInfo.macros.fats}</span>
+                                        <span className="text-sm font-medium">{plan.fatsPercent}</span>
                                       </div>
                                     </div>
                                   </div>
@@ -536,7 +536,7 @@ export default function MealPlansPage() {
                                     Health Benefits
                                   </h4>
                                   <div className="grid grid-cols-1 gap-2">
-                                    {plan.additionalInfo.benefits.map((benefit, index) => (
+                                    {plan.benefits.map((benefit, index) => (
                                       <div
                                         key={index}
                                         className="flex items-center space-x-2 p-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg"
@@ -556,7 +556,7 @@ export default function MealPlansPage() {
                                     Sample Meals
                                   </h4>
                                   <div className="space-y-2">
-                                    {plan.additionalInfo.sampleMeals.map((meal, index) => (
+                                    {plan.sampleMeals.map((meal, index) => (
                                       <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg">
                                         <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 rounded-full flex items-center justify-center">
                                           <span className="text-sm font-medium text-emerald-600">{index + 1}</span>
@@ -570,9 +570,11 @@ export default function MealPlansPage() {
                             </Tabs>
 
                             <div className="flex space-x-3 pt-4">
-                              <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white">
+                              <Link href={"/subscription"}>
+                                    <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white">
                                 Choose This Plan
                               </Button>
+                              </Link>
                               <Button variant="outline" className="border-emerald-600 text-emerald-600">
                                 <Heart className="h-4 w-4" />
                               </Button>
@@ -582,7 +584,9 @@ export default function MealPlansPage() {
                       </DialogContent>
                     </Dialog>
 
-                    <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white">Choose Plan</Button>
+                    <Link href={"/subscription"}>
+                        <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white">Choose Plan</Button>
+                    </Link>
 
                   </div>
 
@@ -655,12 +659,16 @@ export default function MealPlansPage() {
               Choose your perfect meal plan and let us take care of your nutrition while you focus on your goals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 px-8">
-                Get Started Today
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8 hover:text-white">
-                Contact Nutritionist
-              </Button>
+              <Link href={"/subscription"}>
+                <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 px-8">
+                  Get Started Today
+                </Button>
+              </Link>
+              <Link href={"/contact"}>
+                <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8 hover:text-white">
+                  Contact Nutritionist
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

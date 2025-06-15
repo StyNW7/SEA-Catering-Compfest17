@@ -44,7 +44,7 @@ async function main() {
         description: "A balanced meal plan designed for weight management and healthy eating habits with portion-controlled meals.",
         image: "/images/meal/diet-plan.png",
         category: "weight-loss",
-        popular: true,
+        popular: false,
         features: ["Calorie-controlled portions", "Low-carb options", "Fresh ingredients"],
         duration: "Flexible (weekly subscription)",
         mealsPerDay: 3,
@@ -149,27 +149,8 @@ async function main() {
     ],
     skipDuplicates: true,
   });
+  
   console.log(`Created ${testimonials.count} testimonials`);
-
-  // Create a sample subscription for the regular user
-  const mealPlan = await prisma.mealPlan.findFirst({
-    where: { name: "Balanced Lifestyle Plan" }
-  });
-
-  if (mealPlan) {
-    const subscription = await prisma.subscription.create({
-      data: {
-        userId: regularUser.id,
-        planId: mealPlan.id,
-        mealTypes: ["Breakfast", "Lunch", "Dinner"],
-        deliveryDays: ["Monday", "Wednesday", "Friday"],
-        allergies: "None",
-        totalPrice: 299.00,
-        status: "Active"
-      }
-    });
-    console.log('Created subscription:', subscription);
-  }
 
 }
 
