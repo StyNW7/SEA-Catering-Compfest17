@@ -1,10 +1,16 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
+
+type RouteParams = {
+  params: {
+    id: string
+  }
+}
 
 // Get single subscription
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+    { params }: RouteParams
 ): Promise<NextResponse>  {
   try {
     const { id } = params
@@ -42,8 +48,8 @@ export async function GET(
 
 // Update subscription
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+    { params }: RouteParams
 ): Promise<NextResponse>  {
 
   try {
@@ -97,8 +103,8 @@ export async function PUT(
 
 // Delete subscription
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+    { params }: RouteParams
 ): Promise<NextResponse>  {
   try {
 

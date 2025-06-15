@@ -1,9 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import {prisma} from '@/lib/prisma'
 
+type RouteParams = {
+  params: {
+    id: string
+  }
+}
+
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+      { params }: RouteParams
 ): Promise<NextResponse> {
   try {
     const { id } = params
