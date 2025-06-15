@@ -48,15 +48,36 @@ enum Role {
   ADMIN
 }
 
+
 // MealPlan model
 model MealPlan {
-  id          String @id @default(cuid())
-  name        String @unique
-  pricePerMeal Float
-  description String
-  imageUrl    String? // Optional image URL
-  subscriptions Subscription[]
+  
+  id              String     @id @default(cuid())
+  name            String
+  price           String
+  originalPrice   String?
+  description     String     @db.Text
+  image           String
+  category        String     // "weight-loss" | "muscle-building" | "balanced" | "premium"
+  popular         Boolean    @default(false)
+  features        String[]   // Array of features
+  duration        String     // From additionalInfo
+  mealsPerDay     Int
+  calories        String
+  proteinPercent  String     // From macros
+  carbsPercent    String     // From macros
+  fatsPercent     String     // From macros
+  includes        String[]   // Array of included items
+  benefits        String[]   // Array of benefits
+  sampleMeals     String[]   // Array of sample meals
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relation to subscriptions (if needed)
+  subscriptions   Subscription[]
+
 }
+
 
 // Subscription model
 model Subscription {
