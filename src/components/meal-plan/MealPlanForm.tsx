@@ -16,19 +16,15 @@ const defaultValues: Partial<MealPlan> = {
   category: 'weight-loss',
   popular: false,
   features: [],
-  additionalInfo: {
-    duration: '',
-    mealsPerDay: 3,
-    calories: '',
-    macros: {
-      protein: '',
-      carbs: '',
-      fats: ''
-    },
-    includes: [],
-    benefits: [],
-    sampleMeals: []
-  }
+  duration: '',
+  mealsPerDay: 3,
+  calories: '',
+  proteinPercent: '',
+  carbsPercent: '',
+  fatsPercent: '',
+  includes: [],
+  benefits: [],
+  sampleMeals: [],
 }
 
 export function MealPlanForm({ 
