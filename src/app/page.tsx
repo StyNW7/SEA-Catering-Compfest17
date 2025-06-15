@@ -631,7 +631,7 @@ export default function HomePage() {
                 <Zap className="h-5 w-5 mr-2" />
                 Start Your Journey Today
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8">
+              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8 hover:text-white">
                 View Sample Menu
               </Button>
             </div>

@@ -113,3 +113,8 @@
   background: #10B981;
   border-radius: 10px;
 }
+
+/* Hide Next.js dev error overlay */
+nextjs-portal {
+  display: none !important;
+}

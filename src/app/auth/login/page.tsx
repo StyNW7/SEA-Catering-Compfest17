@@ -28,6 +28,8 @@ type DotStyle = {
 
 export default function LoginPage() {
 
+  const {user} = useAuth()
+
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
@@ -90,47 +92,10 @@ export default function LoginPage() {
   }
 
 
-  // const onSubmit = async (data: LoginFormValues) => {
+  if (user){
+    router.push("/")
+  }
   
-  //   try {
-  //     const response = await fetch('/api/auth/login', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         email: data.email,
-  //         password: data.password,
-  //       }),
-  //     });
-
-  //     const result = await response.json();
-
-  //     if (!response.ok) {
-  //       toast("Login Failed!",{
-  //         description: result.error || 'Login failed',
-  //       })
-  //       // throw new Error(result.error || 'Login failed');
-  //     }
-
-  //     else {
-  //       toast("Login Successful!",{
-  //         description: "You are logged in right now",
-  //       })
-
-  //       router.push("/");
-  //     }
-
-  //   } catch (error: any) {
-
-  //     console.error("Login error:", error);
-
-  //     toast("Login Failed!",{
-  //       description: error || "Something went wrong. Please try again.",
-  //     })
-
-  //   }
-  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-orange-50 dark:from-emerald-950/20 dark:via-background dark:to-orange-950/20 relative overflow-hidden">

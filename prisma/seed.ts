@@ -56,33 +56,7 @@ async function main() {
   });
   console.log('Admin user created:', adminUser);
 
-  // Create Sample Testimonials
-  // const testimonials = [
-  //   {
-  //     customerName: 'Alice Wonderland',
-  //     reviewMessage: 'SEA Catering has transformed my eating habits! The Diet Plan is delicious and effective.',
-  //     rating: 5,
-  //   },
-  //   {
-  //     customerName: 'Bob The Builder',
-  //     reviewMessage: 'As a busy professional, the Protein Plan is a lifesaver. High quality and convenient!',
-  //     rating: 4,
-  //   },
-  //   {
-  //     customerName: 'Charlie Chaplin',
-  //     reviewMessage: 'The Royal Plan is a culinary delight. Every meal feels like a gourmet experience.',
-  //     rating: 5,
-  //   },
-  // ];
-
-  // for (const t of testimonials) {
-  //   await prisma.testimonial.upsert({
-  //     where: { customerName: t.customerName },
-  //     update: {},
-  //     create: t,
-  //   });
-  // }
-  // console.log('Sample testimonials created.');
+  
 
 }
 

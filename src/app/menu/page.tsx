@@ -206,6 +206,7 @@ const categories = [
 ]
 
 export default function MealPlansPage() {
+  
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -285,8 +286,11 @@ export default function MealPlansPage() {
       </section>
 
       {/* Meal Plans Grid */}
+
       <section className="py-20">
+
         <div className="container">
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPlans.map((plan, index) => (
               <Card
@@ -348,6 +352,7 @@ export default function MealPlansPage() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
+                  
                   <div className="grid grid-cols-2 gap-2">
                     {plan.features.slice(0, 4).map((feature, featureIndex) => (
                       <div key={featureIndex} className="flex items-center space-x-2 text-sm">
@@ -358,16 +363,22 @@ export default function MealPlansPage() {
                   </div>
 
                   <div className="flex space-x-2 pt-4">
+
                     <Dialog>
+
                       <DialogTrigger asChild>
+
                         <Button
                           variant="outline"
                           className="flex-1 border-emerald-600 text-emerald-600 hover:bg-emerald-50"
                         >
                           See More Details
                         </Button>
+
                       </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+
+                      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+
                         <DialogHeader>
                           <DialogTitle className="text-2xl flex items-center space-x-2">
                             <span>{plan.name}</span>
@@ -381,7 +392,7 @@ export default function MealPlansPage() {
                           <DialogDescription className="text-base">{plan.description}</DialogDescription>
                         </DialogHeader>
 
-                        <div className="grid md:grid-cols-2 gap-6 mt-6">
+                        <div className="grid gap-6 mt-6">
                           <div className="space-y-6">
                             <Image
                               src={plan.image || "/placeholder.svg"}
@@ -572,13 +583,18 @@ export default function MealPlansPage() {
                     </Dialog>
 
                     <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white">Choose Plan</Button>
+
                   </div>
+
                 </CardContent>
+
               </Card>
+
             ))}
           </div>
         </div>
       </section>
+
 
       {/* Features Section */}
       <section className="py-20 bg-muted/30">
@@ -642,7 +658,7 @@ export default function MealPlansPage() {
               <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 px-8">
                 Get Started Today
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8">
+              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8 hover:text-white">
                 Contact Nutritionist
               </Button>
             </div>

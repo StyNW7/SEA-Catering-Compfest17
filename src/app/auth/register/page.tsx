@@ -15,10 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { registerSchema } from "@/lib/zod-schemas"; // Import your Zod schema
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+
+  const {user} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -77,6 +80,10 @@ export default function RegisterPage() {
 
     }
   };
+
+  if (user){
+    router.push("/")
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-emerald-50 dark:from-orange-950/20 dark:via-background dark:to-emerald-950/20 relative overflow-hidden">

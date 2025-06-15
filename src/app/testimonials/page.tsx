@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import type React from "react"
@@ -26,6 +27,9 @@ import {
 
 import { Navbar } from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
+import { toast } from "sonner"
+import Link from "next/link"
+import { useAuth } from "@/context/AuthContext"
 
 interface Testimonial {
   id: string
@@ -39,113 +43,20 @@ interface Testimonial {
   plan: string
 }
 
-const testimonials: Testimonial[] = [
-  {
-    id: "1",
-    name: "Andi Pratama",
-    location: "Jakarta",
-    rating: 5,
-    message:
-      "SEA Catering has completely transformed my eating habits! The Weight Loss plan helped me lose 15kg in 6 months. The meals are delicious, nutritious, and always delivered on time. I especially love the variety - never gets boring!",
-    date: "2024-01-15",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Weight Loss Starter",
-  },
-  {
-    id: "2",
-    name: "Sari Dewi",
-    location: "Surabaya",
-    rating: 5,
-    message:
-      "As a working mom, SEA Catering is a lifesaver! The Family Plan saves me hours of meal prep while ensuring my kids eat healthy. The customer service is exceptional, and they accommodate all our dietary preferences perfectly.",
-    date: "2024-01-10",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Balanced Family Plan",
-  },
-  {
-    id: "3",
-    name: "Budi Santoso",
-    location: "Bandung",
-    rating: 5,
-    message:
-      "The Muscle Building Pro plan is exactly what I needed for my fitness goals. High-quality proteins, perfect portions, and the post-workout meals are incredible. Gained 8kg of lean muscle in 4 months!",
-    date: "2024-01-08",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Muscle Building Pro",
-  },
-  {
-    id: "4",
-    name: "Maya Sinta",
-    location: "Medan",
-    rating: 4,
-    message:
-      "Love the Premium Gourmet plan! The presentation is restaurant-quality and the flavors are amazing. Only wish there were more Indonesian fusion options, but overall very satisfied with the service.",
-    date: "2024-01-05",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Premium Gourmet",
-  },
-  {
-    id: "5",
-    name: "Rizki Hakim",
-    location: "Yogyakarta",
-    rating: 5,
-    message:
-      "The Keto Advanced plan helped me achieve ketosis quickly and safely. Lost 12kg in 3 months and feel more energetic than ever. The meal variety keeps me motivated, and the nutritionist support is invaluable.",
-    date: "2024-01-03",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Keto Advanced",
-  },
-  {
-    id: "6",
-    name: "Indira Putri",
-    location: "Bali",
-    rating: 5,
-    message:
-      "Switched to the Vegan Power Plan 6 months ago and couldn't be happier! The plant-based meals are creative, filling, and nutritious. My digestion improved significantly, and I have more energy throughout the day.",
-    date: "2024-01-01",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Vegan Power Plan",
-  },
-  {
-    id: "7",
-    name: "Fajar Nugroho",
-    location: "Semarang",
-    rating: 4,
-    message:
-      "Great service overall! The meals are tasty and delivery is always punctual. Sometimes I wish for more spicy options, but the quality is consistently good. Customer support is very responsive.",
-    date: "2023-12-28",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Balanced Family Plan",
-  },
-  {
-    id: "8",
-    name: "Lestari Wulan",
-    location: "Makassar",
-    rating: 5,
-    message:
-      "SEA Catering made healthy eating so convenient! The Weight Loss plan fits perfectly into my busy schedule. Lost 10kg and gained so much confidence. The nutritionist consultations are a great bonus!",
-    date: "2023-12-25",
-    avatar: "/placeholder.svg?height=60&width=60",
-    verified: true,
-    plan: "Weight Loss Starter",
-  },
-]
-
 const ITEMS_PER_PAGE = 6
 
 export default function TestimonialsPage() {
+
+  const {user} = useAuth();
+
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  const [, setIsLoading] = useState(true)
 
   const [isLoaded, setIsLoaded] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [ratingFilter, setRatingFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
+
   const [newTestimonial, setNewTestimonial] = useState({
     name: "",
     location: "",
@@ -153,18 +64,43 @@ export default function TestimonialsPage() {
     rating: 5,
     plan: "",
   })
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [featuredIndex, setFeaturedIndex] = useState(0)
+
+  // Featured testimonials (top 3 highest rated)
+  const featuredTestimonials = testimonials.filter((t) => t.rating >= 4).slice(0, 3)
 
   useEffect(() => {
     setIsLoaded(true)
 
-    // Auto-rotate featured testimonials
-    const interval = setInterval(() => {
-      setFeaturedIndex((prev) => (prev + 1) % Math.min(testimonials.length, 3))
-    }, 5000)
+    // Auto-rotate only if there are featured testimonials
+    if (featuredTestimonials.length > 0) {
+      const interval = setInterval(() => {
+        setFeaturedIndex((prev) => (prev + 1) % featuredTestimonials.length)
+      }, 3500)
 
-    return () => clearInterval(interval)
+      return () => clearInterval(interval)
+    }
+  }, [featuredTestimonials.length])
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch('/api/testimonials')
+        if (!response.ok) {
+          throw new Error('Failed to fetch testimonials')
+        }
+        const data = await response.json()
+        setTestimonials(data)
+      } catch {
+        console.log("Error")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchTestimonials()
   }, [])
 
   // Filter testimonials
@@ -184,27 +120,55 @@ export default function TestimonialsPage() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
   const paginatedTestimonials = filteredTestimonials.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
-  // Featured testimonials (top 3 highest rated)
-  const featuredTestimonials = testimonials.filter((t) => t.rating === 5).slice(0, 3)
-
   const handleSubmitTestimonial = async (e: React.FormEvent) => {
+
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Reset form
-    setNewTestimonial({
-      name: "",
-      location: "",
-      message: "",
-      rating: 5,
-      plan: "",
-    })
+    try {
+      const response = await fetch('/api/testimonials', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTestimonial),
+      })
 
-    setIsSubmitting(false)
-    alert("Thank you for your testimonial! It will be reviewed and published soon.")
+      if (!response.ok) {
+        throw new Error('Failed to submit testimonial')
+      }
+
+      toast("Success",{
+        description: 'Your testimonial has been submitted.',
+      })
+
+      setNewTestimonial({
+        name: '',
+        location: '',
+        rating: 5,
+        message: '',
+        plan: 'Weight Loss Starter',
+      })
+
+    } catch {
+      toast("Error",{
+        description: 'Failed to submit testimonial. Please try again.',
+      })
+    } finally {
+      setNewTestimonial({
+        name: "",
+        location: "",
+        message: "",
+        rating: 5,
+        plan: "",
+      })
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      setIsSubmitting(false)
+      location.reload()
+    }
   }
 
   const renderStars = (rating: number, size: "sm" | "md" | "lg" = "sm") => {
@@ -594,7 +558,7 @@ export default function TestimonialsPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-emerald-600 text-white">
+      {/* <section className="py-20 bg-emerald-600 text-white">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Customer Satisfaction</h2>
@@ -618,7 +582,7 @@ export default function TestimonialsPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-orange-600 to-orange-700 text-white">
@@ -629,13 +593,17 @@ export default function TestimonialsPage() {
               Start your healthy eating journey today and become our next success story!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 px-8">
-                <TrendingUp className="h-5 w-5 mr-2" />
-                Start Your Journey
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8">
-                View Meal Plans
-              </Button>
+              <Link href="/auth/login">
+                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 px-8">
+                  <TrendingUp className="h-5 w-5 mr-2" />
+                  Start Your Journey
+                </Button>
+              </Link>
+              <Link href="/menu">
+                <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8 hover:text-white">
+                  View Meal Plans
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
