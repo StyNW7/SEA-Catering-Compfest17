@@ -33,6 +33,7 @@ import Image from "next/image"
 
 import { Navbar } from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
+import Link from "next/link"
 
 export default function HomePage() {
 
@@ -301,7 +302,9 @@ export default function HomePage() {
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Choose Plan</Button>
+                  <Link href={"/menu"}>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Choose Plan</Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}

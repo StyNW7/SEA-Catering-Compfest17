@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const router = useRouter(); // Correct useRouter import
+  const router = useRouter();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -221,11 +221,11 @@ export default function RegisterPage() {
                     <input type="checkbox" className="rounded border-gray-300 mt-1" required />
                     <span className="text-sm">
                       I agree to the{" "}
-                      <Link href="/terms" className="text-orange-600 hover:text-orange-700 font-medium">
+                      <Link href="/privacy-terms" className="text-orange-600 hover:text-orange-700 font-medium">
                         Terms of Service
                       </Link>{" "}
                       and{" "}
-                      <Link href="/privacy" className="text-orange-600 hover:text-orange-700 font-medium">
+                      <Link href="/privacy-terms" className="text-orange-600 hover:text-orange-700 font-medium">
                         Privacy Policy
                       </Link>
                     </span>
