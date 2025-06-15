@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {prisma} from '@/lib/prisma'
 
-type RouteParams = {
-  params: {
-    id: string
-  }
-}
-
 export async function DELETE(
   request: NextRequest,
-      { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
-    const { id } = params
+    
+    const id = (await params).id; 
 
     // Verify testimonial exists
     const existingTestimonial = await prisma.testimonial.findUnique({

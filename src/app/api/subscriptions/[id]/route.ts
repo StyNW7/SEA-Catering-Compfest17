@@ -1,19 +1,14 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-type RouteParams = {
-  params: {
-    id: string
-  }
-}
-
 // Get single subscription
 export async function GET(
   request: NextRequest,
-    { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse>  {
   try {
-    const { id } = params
+    
+    const id = (await params).id; 
 
     const subscription = await prisma.subscription.findUnique({
       where: { id },
@@ -49,11 +44,12 @@ export async function GET(
 // Update subscription
 export async function PUT(
   request: NextRequest,
-    { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse>  {
 
   try {
-    const { id } = params
+
+    const id = (await params).id; 
     const body = await request.json()
 
     // Verify subscription exists
@@ -104,11 +100,11 @@ export async function PUT(
 // Delete subscription
 export async function DELETE(
   request: NextRequest,
-    { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse>  {
   try {
 
-    const { id } = params
+    const id = (await params).id; 
 
     // Verify subscription exists
     const existingSubscription = await prisma.subscription.findUnique({
