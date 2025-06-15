@@ -8,7 +8,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
-  ChefHat,
   Truck,
   Heart,
   Star,
@@ -29,10 +28,11 @@ import {
   Zap,
   PersonStandingIcon,
 } from "lucide-react"
-import Link from "next/link"
+
 import Image from "next/image"
 
 import { Navbar } from "@/components/layout/navbar"
+import Footer from "@/components/layout/footer"
 
 export default function HomePage() {
 
@@ -640,101 +640,8 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="container">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 rounded-full">
-                  <ChefHat className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-xl font-bold text-emerald-400">SEA Catering</span>
-              </div>
-              <p className="text-gray-400">Healthy Meals, Anytime, Anywhere</p>
-              <div className="flex space-x-4">
-                <Button size="icon" variant="ghost" className="hover:bg-gray-800 hover:text-white">
-                  <Instagram className="h-4 w-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="hover:bg-gray-800 hover:text-white">
-                  <Facebook className="h-4 w-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="hover:bg-gray-800 hover:text-white">
-                  <Twitter className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+      <Footer/>
 
-            <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="#home" className="hover:text-emerald-400 transition-colors">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#about" className="hover:text-emerald-400 transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#services" className="hover:text-emerald-400 transition-colors">
-                    Services
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#contact" className="hover:text-emerald-400 transition-colors">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Services</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="#" className="hover:text-emerald-400 transition-colors">
-                    Weight Loss Plan
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-emerald-400 transition-colors">
-                    Muscle Building
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-emerald-400 transition-colors">
-                    Balanced Nutrition
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-emerald-400 transition-colors">
-                    Custom Plans
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Newsletter</h4>
-              <p className="text-gray-400 mb-4">Subscribe to get updates on new meal plans and special offers.</p>
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="Your email"
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-                />
-                <Button className="bg-emerald-600 hover:bg-emerald-700">Subscribe</Button>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} SEA Catering. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
