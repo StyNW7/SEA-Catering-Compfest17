@@ -1,161 +1,159 @@
-// "use client";
+"use client"
 
-// import Link from "next/link";
-// import { usePathname } from "next/navigation";
-// import { Button } from "@/components/ui/button";
-// import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-// import { MenuIcon, Package2Icon, SunIcon, MoonIcon, LogOutIcon } from "lucide-react";
-// import { useState, useEffect } from "react";
-// import { useSession, signOut } from "next-auth/react";
-// import Image from "next/image"; // For your logo
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { ChefHat, Menu, X } from "lucide-react" // Added X icon for close button
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@/context/AuthContext"
+import { cn } from "@/lib/utils"
+import { useMobileMenu } from "@/hooks/useMobileMenu"
 
-// export function Navbar() {
+export function Navbar() {
+  const { isOpen, toggleMenu, closeMenu } = useMobileMenu()
+  const { user, logout } = useAuth()
+  const pathname = usePathname()
 
-//   const pathname = usePathname();
-//   const { data: session, status } = useSession();
-//   const [isDarkMode, setIsDarkMode] = useState(false);
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/menu", label: "Menu" },
+    { href: "/subscription", label: "Subscription" },
+    { href: "/contact", label: "Contact Us" },
+  ]
 
-//   useEffect(() => {
-//     // Check local storage or system preference for dark mode
-//     const storedTheme = localStorage.getItem('theme');
-//     if (storedTheme === 'dark') {
-//       document.documentElement.classList.add('dark');
-//       setIsDarkMode(true);
-//     } else if (storedTheme === 'light') {
-//       document.documentElement.classList.remove('dark');
-//       setIsDarkMode(false);
-//     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-//       document.documentElement.classList.add('dark');
-//       setIsDarkMode(true);
-//     }
-//   }, []);
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2" onClick={closeMenu}>
+          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 rounded-full">
+            <ChefHat className="h-6 w-6 text-white" />
+          </div>
+          <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+            SEA Catering
+          </span>
+        </Link>
 
-//   const toggleDarkMode = () => {
-//     const newMode = !isDarkMode;
-//     setIsDarkMode(newMode);
-//     if (newMode) {
-//       document.documentElement.classList.add('dark');
-//       localStorage.setItem('theme', 'dark');
-//     } else {
-//       document.documentElement.classList.remove('dark');
-//       localStorage.setItem('theme', 'light');
-//     }
-//   };
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-emerald-600",
+                pathname === link.href ? "text-emerald-600" : "text-foreground"
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
-//   const navLinks = [
-//     { name: "Home", href: "/" },
-//     { name: "Menu / Meal Plans", href: "/menu" },
-//     { name: "Subscription", href: "/subscribe" },
-//     { name: "Testimonials", href: "/testimonials" },
-//     { name: "Contact Us", href: "/contact" },
-//   ];
+        {/* Desktop Auth Buttons */}
+        {user ? (
+          <div className="hidden md:flex items-center space-x-4">
+            <Link href="/dashboard">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                Dashboard
+              </Button>
+            </Link>
+            <Button
+              variant="outline" className="text-emerald-600 hover:text-emerald-700 border-emerald-600 hover:bg-emerald-50"
+              onClick={logout}
+            >
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center space-x-4">
+            <Link href="/auth/login">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                Login
+              </Button>
+            </Link>
+            <Link href="/auth/register">
+              <Button variant="outline" className="text-emerald-600 hover:text-emerald-700 border-emerald-600 hover:bg-emerald-50">
+                Register
+              </Button>
+            </Link>
+          </div>
+        )}
 
-//   return (
-//     <header className="sticky top-0 z-50 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6 shadow-sm">
-//       <Link href="/" className="flex items-center gap-2 font-semibold">
-//         {/* Replace with your actual logo */}
-//         <Image
-//           src="/images/logo.png" // Make sure you have a logo.png in your public/images folder
-//           alt="SEA Catering Logo"
-//           width={40}
-//           height={40}
-//           className="rounded-full"
-//         />
-//         <span className="text-lg">SEA Catering</span>
-//       </Link>
-//       <nav className="hidden md:flex md:items-center md:gap-5 lg:gap-6 text-sm font-medium">
-//         {navLinks.map((link) => (
-//           <Link
-//             key={link.name}
-//             href={link.href}
-//             className={`transition-colors hover:text-foreground ${
-//               pathname === link.href ? "text-foreground" : "text-muted-foreground"
-//             }`}
-//           >
-//             {link.name}
-//           </Link>
-//         ))}
-//         {/* Conditional Dashboard Link */}
-//         {status === "authenticated" && (
-//           <Link
-//             href={session.user.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user"}
-//             className={`transition-colors hover:text-foreground ${
-//               pathname.startsWith("/dashboard") ? "text-foreground" : "text-muted-foreground"
-//             }`}
-//           >
-//             Dashboard
-//           </Link>
-//         )}
-//       </nav>
+        {/* Mobile Menu Button */}
+        <button 
+          className="md:hidden p-2 rounded-md text-foreground hover:bg-muted focus:outline-none"
+          onClick={toggleMenu}
+          aria-label={isOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isOpen}
+        >
+          {isOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6"/>
+          )}
+        </button>
+      </div>
 
-//       <div className="flex items-center gap-4">
-//         {/* Dark Mode Toggle */}
-//         <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
-//           {isDarkMode ? <MoonIcon className="h-5 w-5" /> : <SunIcon className="h-5 w-5" />}
-//           <span className="sr-only">Toggle dark mode</span>
-//         </Button>
-
-//         {/* Auth Buttons */}
-//         {status === "loading" && (
-//           <div className="h-8 w-16 bg-gray-200 animate-pulse rounded"></div> // Placeholder for loading state
-//         )}
-//         {status === "unauthenticated" && (
-//           <Button asChild>
-//             <Link href="/auth/login">Login</Link>
-//           </Button>
-//         )}
-//         {status === "authenticated" && (
-//           <div className="flex items-center gap-2">
-//             <span className="text-sm font-medium hidden sm:inline">{session.user.name || session.user.email}</span>
-//             <Button variant="ghost" size="icon" onClick={() => signOut()}>
-//               <LogOutIcon className="h-5 w-5" />
-//               <span className="sr-only">Sign Out</span>
-//             </Button>
-//           </div>
-//         )}
-//         <Sheet>
-//           <SheetTrigger asChild>
-//             <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-//               <MenuIcon className="h-5 w-5" />
-//               <span className="sr-only">Toggle navigation menu</span>
-//             </Button>
-//           </SheetTrigger>
-//           <SheetContent side="left">
-//             <nav className="grid gap-6 text-lg font-medium">
-//               <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-//                 <Package2Icon className="h-6 w-6" />
-//                 <span className="sr-only">SEA Catering</span>
-//               </Link>
-//               {navLinks.map((link) => (
-//                 <Link
-//                   key={link.name}
-//                   href={link.href}
-//                   className={`hover:text-foreground ${
-//                     pathname === link.href ? "text-foreground" : "text-muted-foreground"
-//                   }`}
-//                 >
-//                   {link.name}
-//                 </Link>
-//               ))}
-//               {status === "authenticated" && (
-//                 <Link
-//                   href={session.user.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user"}
-//                   className={`hover:text-foreground ${
-//                     pathname.startsWith("/dashboard") ? "text-foreground" : "text-muted-foreground"
-//                   }`}
-//                 >
-//                   Dashboard
-//                 </Link>
-//               )}
-//               {status === "authenticated" && (
-//                 <Button variant="ghost" className="justify-start pl-0" onClick={() => signOut()}>
-//                   <LogOutIcon className="h-5 w-5 mr-2" /> Sign Out
-//                 </Button>
-//               )}
-//             </nav>
-//           </SheetContent>
-//         </Sheet>
-//       </div>
-//     </header>
-//   );
-// }
+      {/* Mobile Navigation */}
+      <div className={cn(
+        "md:hidden bg-background border-t overflow-hidden transition-all duration-300 ease-in-out",
+        isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+      )}>
+        <div className="container py-4 space-y-4">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "block py-2 font-medium transition-colors hover:text-emerald-600",
+                pathname === link.href ? "text-emerald-600" : "text-foreground"
+              )}
+              onClick={closeMenu}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <div className="pt-4 space-y-4 border-t">
+            {user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="block w-full py-2 text-center font-medium text-emerald-600"
+                  onClick={closeMenu}
+                >
+                  Dashboard
+                </Link>
+                <Button
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={() => {
+                    logout()
+                    closeMenu()
+                  }}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="block w-full py-2 text-center font-medium text-emerald-600"
+                  onClick={closeMenu}
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="block w-full py-2 text-center bg-emerald-400 text-white rounded-md font-medium"
+                  onClick={closeMenu}
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+}

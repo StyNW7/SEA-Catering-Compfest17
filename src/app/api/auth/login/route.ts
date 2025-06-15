@@ -1,75 +1,85 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextResponse } from 'next/server';
-import {prisma} from '@/lib/prisma'; // Changed to default import
-import bcrypt from 'bcryptjs';
-import { z } from 'zod';
+import { NextResponse } from 'next/server'
+import {prisma} from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
+import { loginSchema } from '@/lib/zod-schemas'
+import { createSession, User } from '@/lib/session'
 
-// Define login schema
-const loginSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password must be at least 6 characters')
-});
-
-// POST /api/auth/login
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // Parse and validate input
+    const body = await request.json()
+    const validatedData = loginSchema.safeParse(body)
 
-    // Validate input
-    const validatedData = loginSchema.safeParse(body);
     if (!validatedData.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: validatedData.error.flatten().fieldErrors },
+        { error: 'Validation failed', details: validatedData.error.flatten() },
         { status: 400 }
-      );
+      )
     }
 
-    const { email, password } = validatedData.data;
+    const { email, password } = validatedData.data
 
-    // Find user by email
+    // Find user with password
     const user = await prisma.user.findUnique({
-      where: { email }
-    });
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    })
 
-    if (!user) {
+    if (!user || !user.password) {
       return NextResponse.json(
-        { error: 'Invalid credentials' }, // Generic message for security
+        { error: 'Invalid email or password' },
         { status: 401 }
-      );
+      )
     }
 
-    // Compare passwords
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
+    // Verify password
+    const passwordValid = await bcrypt.compare(password, user.password)
+    if (!passwordValid) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'Invalid email or password' },
         { status: 401 }
-      );
+      )
     }
 
-    // Return user data (excluding password)
-    const { password: _, ...userWithoutPassword } = user;
+    // Create session
+    const sessionUser: User = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    }
+
+    await createSession(sessionUser)
+
+    // Return response without password
+    const { password: _, ...userData } = user
     return NextResponse.json(
-      { 
+      {
         message: 'Login successful',
-        user: userWithoutPassword 
+        user: userData
       },
       { status: 200 }
-    );
+    )
 
   } catch (error) {
-    console.error('Login error:', error);
-    
-    if (error instanceof SyntaxError) {
-      return NextResponse.json(
-        { error: 'Invalid request body' },
-        { status: 400 }
-      );
-    }
-
+    console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'An unexpected error occurred' },
+      { 
+        error: 'Login failed',
+        details: error instanceof Error ? error.message : undefined
+      },
       { status: 500 }
-    );
+    )
   }
 }

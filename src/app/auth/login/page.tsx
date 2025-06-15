@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { loginSchema } from "@/lib/zod-schemas"
+import { useAuth } from "@/context/AuthContext"
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -66,51 +67,70 @@ export default function LoginPage() {
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = form;
 
+  const { login } = useAuth()
+
   useEffect(() => {
     setIsLoaded(true)
   }, [])
 
-  const onSubmit = async (data: LoginFormValues) => {
-  
+
+
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        toast("Login Failed!",{
-          description: result.error || 'Login failed',
-        })
-        // throw new Error(result.error || 'Login failed');
-      }
-
-      else {
-        toast("Login Successful!",{
-          description: "You are logged in right now",
-        })
-
-        router.push("/");
-      }
-
-    } catch (error: any) {
-
-      console.error("Login error:", error);
-
-      toast("Login Failed!",{
-        description: error || "Something went wrong. Please try again.",
+      await login(data.email, data.password)
+      toast.success("Login Successful!", {
+        description: "You are now logged in",
       })
-
+      router.push("/")
+    } catch (error) {
+      toast.error("Login Failed!", {
+        description: error instanceof Error ? error.message : "Invalid credentials",
+      })
     }
-  };
+  }
+
+
+  // const onSubmit = async (data: LoginFormValues) => {
+  
+  //   try {
+  //     const response = await fetch('/api/auth/login', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         email: data.email,
+  //         password: data.password,
+  //       }),
+  //     });
+
+  //     const result = await response.json();
+
+  //     if (!response.ok) {
+  //       toast("Login Failed!",{
+  //         description: result.error || 'Login failed',
+  //       })
+  //       // throw new Error(result.error || 'Login failed');
+  //     }
+
+  //     else {
+  //       toast("Login Successful!",{
+  //         description: "You are logged in right now",
+  //       })
+
+  //       router.push("/");
+  //     }
+
+  //   } catch (error: any) {
+
+  //     console.error("Login error:", error);
+
+  //     toast("Login Failed!",{
+  //       description: error || "Something went wrong. Please try again.",
+  //     })
+
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-orange-50 dark:from-emerald-950/20 dark:via-background dark:to-orange-950/20 relative overflow-hidden">

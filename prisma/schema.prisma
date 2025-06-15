@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  export   = ["User", "Account", "MealPlan", "Subscription", "Testimonial"]
 }
 
 datasource db {

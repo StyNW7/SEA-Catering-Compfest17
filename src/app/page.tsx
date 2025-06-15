@@ -32,6 +32,8 @@ import {
 import Link from "next/link"
 import Image from "next/image"
 
+import { Navbar } from "@/components/layout/navbar"
+
 export default function HomePage() {
 
   const [isVisible, setIsVisible] = useState(false)
@@ -41,46 +43,10 @@ export default function HomePage() {
   }, [])
 
   return (
+
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 rounded-full">
-              <ChefHat className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">SEA Catering</span>
-          </div>
-
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="#home" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-              Home
-            </Link>
-            <Link href="#about" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-              About
-            </Link>
-            <Link href="#services" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-              Services
-            </Link>
-            <Link href="#testimonials" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-              Testimonials
-            </Link>
-            <Link href="#contact" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-              Contact
-            </Link>
-          </nav>
-
-          <nav className="hidden md:flex items-center space-x-4">
-            <Link href={"/auth/login"}>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">Login</Button>
-            </Link>
-            <Link href={"/auth/register"}>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">Register</Button>
-            </Link>
-          </nav>
-
-        </div>
-      </header>
+      
+      <Navbar/>
 
       {/* Hero Section */}
       <section id="home" className="relative py-20 md:py-32 overflow-hidden">
