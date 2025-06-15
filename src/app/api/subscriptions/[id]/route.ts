@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from '@/lib/session';
 
 // Get single subscription
 export async function GET(
@@ -135,6 +136,60 @@ export async function DELETE(
     )
   }
 }
+
+
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+  try {
+
+    const session = await getServerSession();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const id = (await params).id; 
+    const { status, endDate } = await request.json();
+
+    const updatedSubscription = await prisma.subscription.update({
+      where: { 
+        id,
+        userId: session.user.id
+      },
+      data: {
+        status,
+        ...(endDate && { endDate: new Date(endDate) })
+      },
+      include: {
+        mealPlan: true
+      }
+    });
+
+    return NextResponse.json({
+      id: updatedSubscription.id,
+      planName: updatedSubscription.mealPlan.name,
+      planType: updatedSubscription.mealPlan.category,
+      price: updatedSubscription.totalPrice,
+      mealTypes: updatedSubscription.mealTypes,
+      deliveryDays: updatedSubscription.deliveryDays,
+      status: updatedSubscription.status.toLowerCase(),
+      startDate: updatedSubscription.startDate.toISOString(),
+      nextBilling: updatedSubscription.endDate?.toISOString(),
+      pausedUntil: updatedSubscription.endDate?.toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error updating subscription:', error);
+    return NextResponse.json(
+      { error: 'Failed to update subscription' },
+      { status: 500 }
+    );
+  }
+}
+
+
 
 // Reusable calculateTotalPrice function
 async function calculateTotalPrice(planId: string, mealTypes: string[], deliveryDays: string[]): Promise<number> {

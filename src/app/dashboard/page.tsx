@@ -33,12 +33,14 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface Subscription {
   id: string
   planName: string
   planType: "diet" | "protein" | "royal"
-  price: number
+  totalPrice: number
   mealTypes: string[]
   deliveryDays: string[]
   status: "active" | "paused" | "cancelled"
@@ -52,7 +54,7 @@ const mockSubscriptions: Subscription[] = [
     id: "sub_001",
     planName: "Protein Plan",
     planType: "protein",
-    price: 516000,
+    totalPrice: 516000,
     mealTypes: ["Breakfast", "Lunch", "Dinner"],
     deliveryDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     status: "active",
@@ -63,7 +65,7 @@ const mockSubscriptions: Subscription[] = [
     id: "sub_002",
     planName: "Diet Plan",
     planType: "diet",
-    price: 387000,
+    totalPrice: 387000,
     mealTypes: ["Lunch", "Dinner"],
     deliveryDays: ["Monday", "Wednesday", "Friday", "Sunday"],
     status: "paused",
@@ -84,6 +86,9 @@ const sidebarItems = [
 ]
 
 export default function UserDashboard() {
+
+  const router = useRouter();
+
   const [isLoaded, setIsLoaded] = useState(false)
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(mockSubscriptions)
   const [pauseDialogOpen, setPauseDialogOpen] = useState(false)
@@ -91,6 +96,23 @@ export default function UserDashboard() {
   const [selectedSubscription, setSelectedSubscription] = useState<string>("")
   const [pauseStartDate, setPauseStartDate] = useState<Date>()
   const [pauseEndDate, setPauseEndDate] = useState<Date>()
+
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      try {
+        const response = await fetch('/api/subscriptions')
+        if (!response.ok) throw new Error('Failed to fetch')
+        const data = await response.json()
+        setSubscriptions(data)
+        setIsLoaded(true)
+      } catch (error) {
+        console.error('Error:', error)
+        toast.error('Failed to load subscriptions')
+      }
+    }
+
+    fetchSubscriptions()
+  }, [])
 
   useEffect(() => {
     setIsLoaded(true)
@@ -130,55 +152,119 @@ export default function UserDashboard() {
     }
   }
 
-  const handlePauseSubscription = () => {
-    if (!pauseStartDate || !pauseEndDate || !selectedSubscription) return
 
-    setSubscriptions((prev) =>
-      prev.map((sub) =>
-        sub.id === selectedSubscription
-          ? {
-              ...sub,
-              status: "paused" as const,
-              pausedUntil: format(pauseEndDate, "yyyy-MM-dd"),
-            }
-          : sub,
-      ),
-    )
+  const handlePauseSubscription = async () => {
+    if (!pauseStartDate || !pauseEndDate || !selectedSubscription) return;
 
-    setPauseDialogOpen(false)
-    setPauseStartDate(undefined)
-    setPauseEndDate(undefined)
-    setSelectedSubscription("")
-  }
+    try {
+        const response = await fetch(`/api/subscriptions/${selectedSubscription}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            status: 'paused',
+            endDate: pauseEndDate
+        })
+        });
 
-  const handleCancelSubscription = () => {
-    setSubscriptions((prev) =>
-      prev.map((sub) => (sub.id === selectedSubscription ? { ...sub, status: "cancelled" as const } : sub)),
-    )
+        if (!response.ok) throw new Error('Failed to pause subscription');
 
-    setCancelDialogOpen(false)
-    setSelectedSubscription("")
-  }
+        const updatedSub = await response.json();
+        
+        // Use a single state update with all changes
+        setSubscriptions(prev => prev.map(sub => 
+        sub.id === updatedSub.id 
+            ? { 
+                ...updatedSub,
+                status: "paused",
+                pausedUntil: format(pauseEndDate, "yyyy-MM-dd"),
+                totalPrice: sub.totalPrice
+            } 
+            : sub
+        ));
+        
+        toast.success('Subscription paused successfully');
+        setPauseDialogOpen(false);
+        setPauseStartDate(undefined);
+        setPauseEndDate(undefined);
+        setSelectedSubscription("");
 
-  const handleReactivateSubscription = (subscriptionId: string) => {
-    setSubscriptions((prev) =>
-      prev.map((sub) =>
-        sub.id === subscriptionId
-          ? {
-              ...sub,
-              status: "active" as const,
-              pausedUntil: undefined,
-            }
-          : sub,
-      ),
-    )
-  }
+    } catch {
+        toast.error('Failed to pause subscription');
+    }
+    };
+
+    const handleCancelSubscription = async () => {
+    try {
+        const response = await fetch(`/api/subscriptions/${selectedSubscription}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' })
+        });
+
+        if (!response.ok) throw new Error('Failed to cancel subscription');
+
+        const updatedSub = await response.json();
+        
+        setSubscriptions(prev => prev.map(sub => 
+        sub.id === updatedSub.id 
+            ? { 
+                ...updatedSub,
+                status: "cancelled",
+                totalPrice: sub.totalPrice
+            } 
+            : sub
+        ));
+
+        setCancelDialogOpen(false);
+        setSelectedSubscription("");
+        toast.success('Subscription cancelled');
+        
+    } catch {
+        toast.error('Failed to cancel subscription');
+    }
+    };
+
+    const handleReactivateSubscription = async (subscriptionId: string) => {
+    try {
+        const response = await fetch(`/api/subscriptions/${subscriptionId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            status: 'active',
+            endDate: null 
+        })
+        });
+
+        if (!response.ok) throw new Error('Failed to reactivate subscription');
+
+        const updatedSub = await response.json();
+        
+        setSubscriptions(prev => prev.map(sub => 
+        sub.id === updatedSub.id 
+            ? { 
+                ...updatedSub,
+                status: "active",
+                pausedUntil: undefined,
+                totalPrice: sub.totalPrice
+            } 
+            : sub
+        ));
+        
+        toast.success('Subscription reactivated');
+        
+    } catch {
+        toast.error('Failed to reactivate subscription');
+    }
+    };
+
 
   const activeSubscriptions = subscriptions.filter((sub) => sub.status === "active")
-  const totalMonthlySpend = activeSubscriptions.reduce((sum, sub) => sum + sub.price, 0)
+  const totalMonthlySpend = activeSubscriptions.reduce((sum, sub) => sum + sub.totalPrice, 0)
 
   return (
+
     <div className="min-h-screen bg-background flex">
+        
       {/* Sidebar */}
       <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
         {/* Logo */}
@@ -195,7 +281,7 @@ export default function UserDashboard() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-3">
             <Avatar className="h-12 w-12">
-              <AvatarImage src="/placeholder.svg?height=48&width=48" />
+              <AvatarImage src="/images/placeholder/avatar-1.png" />
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             <div>
@@ -252,10 +338,12 @@ export default function UserDashboard() {
                 <Bell className="h-4 w-4 mr-2" />
                 Notifications
               </Button>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                <Utensils className="h-4 w-4 mr-2" />
-                New Subscription
-              </Button>
+              <Link href={"/subscription"}>
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Utensils className="h-4 w-4 mr-2" />
+                    New Subscription
+                </Button>
+              </Link>
             </div>
           </div>
         </header>
@@ -366,7 +454,7 @@ export default function UserDashboard() {
                               <div>
                                 <h3 className="text-xl font-bold">{subscription.planName}</h3>
                                 <p className="text-2xl font-bold text-emerald-600 mt-1">
-                                  {formatPrice(subscription.price)}
+                                  {formatPrice(subscription.totalPrice)}
                                   <span className="text-sm font-normal text-muted-foreground">/month</span>
                                 </p>
                               </div>
@@ -515,8 +603,9 @@ export default function UserDashboard() {
           >
             <h2 className="text-xl font-bold mb-6">Quick Actions</h2>
             <div className="grid md:grid-cols-3 gap-6">
+
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-6 text-center" onClick={() => router.push("/subscription")}>
                   <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <Utensils className="h-8 w-8 text-emerald-600" />
                   </div>
@@ -526,17 +615,17 @@ export default function UserDashboard() {
               </Card>
 
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-6 text-center" onClick={() => router.push("/menu")}>
                   <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <CalendarIcon className="h-8 w-8 text-orange-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Schedule Delivery</h3>
-                  <p className="text-sm text-muted-foreground">Manage your delivery preferences</p>
+                  <h3 className="font-semibold mb-2">Check Menu Plan</h3>
+                  <p className="text-sm text-muted-foreground">Explore SEA Catering Menu Plan</p>
                 </CardContent>
               </Card>
 
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-6 text-center" onClick={() => router.push("/contact")}>
                   <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <HelpCircle className="h-8 w-8 text-purple-600" />
                   </div>
@@ -577,9 +666,12 @@ export default function UserDashboard() {
                     mode="single"
                     selected={pauseStartDate}
                     onSelect={setPauseStartDate}
-                    disabled={(date: number) => date < new Date()}
-                    initialFocus
-                  />
+                    disabled={(date: Date) => {
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        return date < today
+                    }}
+                    />
                 </PopoverContent>
               </Popover>
             </div>
@@ -598,9 +690,11 @@ export default function UserDashboard() {
                     mode="single"
                     selected={pauseEndDate}
                     onSelect={setPauseEndDate}
-                    disabled={(date: number) => !pauseStartDate || date <= pauseStartDate}
-                    initialFocus
-                  />
+                    disabled={(date: Date) => {
+                        if (!pauseStartDate) return true; 
+                        return date <= pauseStartDate;
+                    }}
+                    />
                 </PopoverContent>
               </Popover>
             </div>
