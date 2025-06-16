@@ -1,4 +1,3 @@
-// components/RouteTransitionHandler.tsx
 "use client"
 
 import { usePathname, useSearchParams } from "next/navigation"

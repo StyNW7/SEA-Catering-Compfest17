@@ -1,9 +1,9 @@
-// middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getServerSession } from '@/lib/session'
 
 export async function middleware(request: NextRequest) {
+
   const { pathname } = request.nextUrl
   
   // Create a cookies object from the request
@@ -47,6 +47,7 @@ export async function middleware(request: NextRequest) {
 
   // Default behavior for all other routes
   return NextResponse.next()
+  
 }
 
 // Helper function for precise route matching

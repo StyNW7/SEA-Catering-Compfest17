@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"; // This MUST be the very first line of your client component file
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
