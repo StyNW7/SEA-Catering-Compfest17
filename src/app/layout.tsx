@@ -26,23 +26,36 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+
         <AuthProvider>
-        {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange> */}
-        
+
           <RouteTransitionHandler />
-          <Suspense fallback={
+
+          {/* <Suspense fallback={
             <LoadingWrapper>
-              <div /> {/* Empty fallback */}
+              <div />
             </LoadingWrapper>
           }>
+
             <LoadingWrapper>
               {children}
               <Toaster/>
             </LoadingWrapper>
+          </Suspense> */}
+
+          <Suspense fallback={
+            <LoadingWrapper>
+              <div className="flex items-center justify-center h-screen">
+                Loading...
+              </div>
+            </LoadingWrapper>
+          }>
+            {children}
+            <Toaster/>
           </Suspense>
-          
-        {/* </ThemeProvider> */}
+
         </AuthProvider>
+
       </body>
     </html>
   )
