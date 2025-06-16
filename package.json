@@ -8,6 +8,8 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
     "prisma:migrate:dev": "npx prisma migrate dev && npx prisma db seed",
     "prisma:seed": "npx prisma db seed"
   },

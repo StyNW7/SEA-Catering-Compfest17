@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
   devIndicators: {
     buildActivity: false,
   },
+  output: 'standalone',
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
+  },
 };
 
 export default nextConfig;

@@ -454,7 +454,7 @@ export default function HomePage() {
                   <p className="text-muted-foreground mb-6 italic">&quot;{testimonial.content}&quot;</p>
                   <div className="flex items-center space-x-3">
                     <Avatar>
-                      <AvatarImage src={testimonial.avatar || "/placeholder.svg"} alt={testimonial.name} />
+                      <AvatarImage src={testimonial.avatar || "/images/placeholder/avatar-3.png"} alt={testimonial.name} />
                       <AvatarFallback>
                         {testimonial.name
                           .split(" ")
