@@ -70,7 +70,6 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 ## 📃 Table of Contents
 - [Complete Documentation](#📚-complete-documentation)
-- [Introduction](#🌟-introduction)
 - [Technology Stack](#🛠️-technology-stack)
 - [Core Features](#🧩-core-features)
 - [Live Demo](#🚀-live-demo)
@@ -88,17 +87,9 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 <ul>
     <li><b>Notion Documentation (Detail Documentation)</b></li>
-    <a href="https://stanley-n-wijaya.notion.site/YoshiKoya-Documentation-1ce73555b71f80cba760c2efe8d4a3ef?pvs=4">YoshiKoya Documentation</a>
+    <a href="https://stanley-n-wijaya.notion.site/SEA-Catering-Documentation-20f73555b71f8045ae6dff108f41acc6?source=copy_link">SEA Catering Documentation</a>
 </ul>
 
-
----
-
-
-## 🌟 Introduction
-**YoshiKoya** is an innovative desktop app to help restaurant owners and staff efficiently manage menus, transactions, deliveries, reservations, and employee roles through a seamless UI powered by modern technologies.
-
-> "Bringing seamless restaurant management with a modern tech stack for efficiency and growth."
 
 ---
 
@@ -114,20 +105,47 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 ## 🧩 Core Features
 
-- 🍽️ **Menu Management** — CRUD for menu items with ingredients and branch association.
-- 🧾 **Transaction Handling** — Manage dine-in and delivery orders using World Real Map (Leaftlet) with voucher discounts.
-- 🛵 **Delivery Management** — Assign delivery personnel based on active queue and track deliveries.
-- 🏢 **Branch & Restaurant Management** — Open/close branches, track restaurant details and locations.
-- 📅 **Table Reservations & Waiting List** — Manual and automatic table assignments, with waitlist notifications.
-- 👥 **Role-Based Access Control** — Different user roles (in total 13 roles) for example CEO, HR, Chef, Waiter, Cashier with permissions.
-- 🔐 **Authentication & Authorization** — JWT-based login system with Redis cache for session management.
-- 📢 **Notification System** — Real-time user notifications for reservations, orders, and system updates.
+### ✅ Level 1: Welcome to SEA Catering
+
+* Static homepage introducing SEA Catering
+* Slogan and business info
+* Contact: Brian – 08123456789
+
+### ✅ Level 2: Making It Interactive
+
+* Responsive navbar (Home, Menu, Subscription, Contact Us)
+* Meal Plan cards with modals
+* Testimonials form + slider
+
+### ✅ Level 3: Subscription System
+
+* Custom form with:
+
+  * Name
+  * Phone
+  * Plan
+  * Meal Types
+  * Delivery Days
+  * Allergies
+* Auto price calculation
+* Database integration using PostgreSQL & SeaORM
+
+### ✅ Level 4: Securing SEA
+
+* JWT Auth with hashed passwords
+* Role-based Access (User & Admin)
+* Form validations and sanitizations (XSS, SQLi, CSRF)
+
+### ✅ Level 5: User & Admin Dashboard
+
+* Users: View, pause, cancel subscriptions
+* Admins: View subscription metrics, MRR, growth
 
 ---
 
 ## 🚀 Live Demo
 Visit the live desktop app demo here:  
-👉 [Coming Soon](Coming Soon)
+👉 https://sea-catering-compfest17.vercel.app/
 
 ---
 
@@ -135,39 +153,32 @@ Visit the live desktop app demo here:
 
 ### Prerequisites
 - **Node.js** (v14 or higher)
-- **Rust** (v1.50 or higher)
-- **Tauri CLI** (`cargo install tauri-cli`)
 - **PostgreSQL** (configured locally or remotely)
-- **Redis Server** (but you can use Docker or WSL)
-- **Docker or WSL**
 - **Git**
 
 ### Clone (Setup Locaclly)
 ```bash
-git clone https://github.com/StyNW7/TPA-YoshiKoya.git
-cd TPA-YoshiKoya
+git clone https://github.com/StyNW7/SEA-Catering-Compfest17.git
+cd sea-catering
 npm install
-npm run tauri dev
-```
-
-### Start and Stop Docker
-```bash
-docker start redis-stack-server
-docker stop redis-stack-server
+npm run dev
+npm run buiild
 ```
 
 ---
 
 ## 🔐 .env Configuration
 
-Default Postgres SQL Server Port is: 5432 (But, you can check it manually)
-Default Redis Server Port is: 6379
+Default Local Postgres SQL Server Port is: 5432 (But, you can check it manually)
 ```
 DATABASE_URL=postgres://username:password@localhost:5432/database_name
-REDIS_URL=redis://127.0.0.1:6379
+SESSION_SECRET=64_character_hex_string_here
+
+Generate Session Secret Key (helper):
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-📌 You can create these files manually or copy from a provided `.env.example` file (recommended).
+📌 You can create these files manually or copy from a provided `.env.example` file (recommended but change it based on your local environment configuration).
 
 ---
 
@@ -285,4 +296,4 @@ Have questions or want to collaborate?
 - 📧 Email: stanley.n.wijaya7@gmail.com
 - 💬 Discord: `stynw7`
 
-<code>FUNFACT made with love in the midst of busyness ❤️‍🔥 </code>
+<code>Made with ❤️ in the midst of busyness 🧑‍🍳 for SEA Academy - COMPFEST 17</code>
