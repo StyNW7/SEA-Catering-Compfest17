@@ -13,7 +13,7 @@ import RouteTransitionHandler from "@/components/utils/RouteTransitionHandler"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "SEA Catering - Healthy Meals Delivered Across Indonesia",
+  title: "SEA Catering",
   description:
     "Customizable healthy meal plans crafted by expert chefs and delivered fresh to your doorstep. Join thousands who've transformed their eating habits with SEA Catering.",
 }

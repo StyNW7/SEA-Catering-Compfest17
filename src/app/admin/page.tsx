@@ -32,6 +32,7 @@ import {
   Crown,
   Pause,
   X,
+  Menu,
 } from "lucide-react"
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns"
 import Link from "next/link"
@@ -52,6 +53,8 @@ import {
 import { toast } from "sonner"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
+import { AdminSidebar } from "@/components/layout/admin-sidebar"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 interface DateRange {
   from: Date
@@ -275,13 +278,15 @@ export default function AdminDashboard() {
 
   // Initial data fetch
   useEffect(() => {
-    fetchAllData()
-  }, [])
+  if (isLoaded && dateRange.from && dateRange.to) {
+    fetchAllData();
+  }
+  }, [dateRange]);
 
   // Refetch metrics when date range changes
   useEffect(() => {
     if (isLoaded) {
-      fetchMetrics()
+      fetchAllData()
     }
   }, [])
 
@@ -309,79 +314,32 @@ export default function AdminDashboard() {
     
     <div className="min-h-screen bg-background flex">
       
-      {/* Sidebar */}
-      <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 rounded-full">
-              <ChefHat className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">SEA Catering</span>
-          </Link>
-          <Badge className="mt-2 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-            Admin Panel
-          </Badge>
-        </div>
+      {/* Desktop Sidebar */}
+      <AdminSidebar className="hidden lg:flex" />
 
-        {/* Admin Profile */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src="/images/placeholder/avatar-1.png" />
-              <AvatarFallback>AD</AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="font-semibold">{user?.name}</div>
-              <div className="text-sm text-muted-foreground">{user?.email}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {sidebarItems.map((item, index) => {
-              const IconComponent = item.icon
-              return (
-                <li key={index}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                      item.active
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400"
-                        : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    <IconComponent className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
-
-        {/* Logout */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-          <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
-            <LogOut className="h-5 w-5 mr-3" />
-            Sign Out
+      {/* Mobile Sidebar */}
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="lg:hidden fixed top-4 left-4 z-50">
+            <Menu className="h-6 w-6" />
           </Button>
-        </div>
-      </div>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-64">
+          <AdminSidebar />
+        </SheetContent>
+      </Sheet>
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-4 lg:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="ml-12 lg:ml-0">
               <h1 className="text-2xl font-bold">Admin Dashboard</h1>
               <p className="text-muted-foreground">Monitor and manage your catering business</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
+             <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button variant="outline" size="sm" className="hidden sm:flex">
                 <Download className="h-4 w-4 mr-2" />
                 Export Data
               </Button>
@@ -394,20 +352,20 @@ export default function AdminDashboard() {
         </header>
 
         {/* Dashboard Content */}
-        <div className="p-6 space-y-8">
+        <div className="p-4 lg:p-6 space-y-6 lg:space-y-8">
           {/* Date Range Selector */}
           <div
             className={`flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between transition-all duration-1000 ${
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="flex items-center space-x-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Date Range:</span>
               </div>
               <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32 sm:w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -424,8 +382,17 @@ export default function AdminDashboard() {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start text-left font-normal">
+                    
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd, yyyy")}
+
+                    <span className="hidden sm:inline">
+                      {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd, yyyy")}
+                    </span>
+
+                    <span className="sm:hidden">
+                      {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd")}
+                    </span>
+                    
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">
@@ -447,7 +414,7 @@ export default function AdminDashboard() {
 
           {/* Key Metrics */}
           <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-1000 delay-200 ${
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 transition-all duration-1000 delay-200 ${
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
@@ -534,7 +501,7 @@ export default function AdminDashboard() {
 
           {/* Charts Section */}
           <div
-            className={`grid lg:grid-cols-2 gap-8 transition-all duration-1000 delay-400 ${
+            className={`grid lg:grid-cols-2 gap-4 lg:gap-8 transition-all duration-1000 delay-400 ${
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
@@ -627,7 +594,7 @@ export default function AdminDashboard() {
 
           {/* Plan Distribution & Recent Activity */}
           <div
-            className={`grid lg:grid-cols-3 gap-8 transition-all duration-1000 delay-600 ${
+            className={`grid lg:grid-cols-3 gap-4 lg:gap-8 transition-all duration-1000 delay-600 ${
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
