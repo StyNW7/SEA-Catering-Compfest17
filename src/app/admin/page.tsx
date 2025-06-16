@@ -308,6 +308,7 @@ export default function AdminDashboard() {
   return (
     
     <div className="min-h-screen bg-background flex">
+      
       {/* Sidebar */}
       <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
         {/* Logo */}

@@ -4,20 +4,14 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
-  ChefHat,
-  User,
   CreditCard,
   CalendarIcon,
-  Settings,
   Bell,
-  HelpCircle,
-  LogOut,
   Play,
   Pause,
   X,
@@ -28,13 +22,16 @@ import {
   Leaf,
   AlertTriangle,
   Edit,
-  Eye,
   MoreHorizontal,
+  Menu,
+  Filter,
 } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { UserSidebar } from "@/components/layout/user-sidebar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAuth } from "@/context/AuthContext"
 
 interface Subscription {
@@ -76,20 +73,9 @@ const mockSubscriptions: Subscription[] = [
   },
 ]
 
-const sidebarItems = [
-  { icon: User, label: "Dashboard", href: "/dashboard", active: true },
-  { icon: CreditCard, label: "Subscriptions", href: "/dashboard/subscriptions" },
-  { icon: CalendarIcon, label: "Delivery Schedule", href: "/dashboard/schedule" },
-  { icon: Utensils, label: "Meal History", href: "/dashboard/meals" },
-  { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
-  { icon: Settings, label: "Account Settings", href: "/dashboard/settings" },
-  { icon: HelpCircle, label: "Help & Support", href: "/dashboard/support" },
-]
-
 export default function UserDashboard() {
 
-  const {user} = useAuth();
-  const router = useRouter();
+  const {user} = useAuth()
 
   const [isLoaded, setIsLoaded] = useState(false)
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(mockSubscriptions)
@@ -99,10 +85,35 @@ export default function UserDashboard() {
   const [pauseStartDate, setPauseStartDate] = useState<Date>()
   const [pauseEndDate, setPauseEndDate] = useState<Date>()
 
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+
+
+  // Get all subscriptions
+
+  // useEffect(() => {
+  //   const fetchSubscriptions = async () => {
+  //     try {
+  //       const response = await fetch('/api/subscriptions')
+  //       if (!response.ok) throw new Error('Failed to fetch')
+  //       const data = await response.json()
+  //       setSubscriptions(data)
+  //       setIsLoaded(true)
+  //     } catch (error) {
+  //       console.error('Error:', error)
+  //       toast.error('Failed to load subscriptions')
+  //     }
+  //   }
+
+  //   fetchSubscriptions()
+  // }, [])
+  
+
+  // Get specific user subscriptions only
+
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
-        const response = await fetch('/api/subscriptions')
+        const response = await fetch(`/api/subscriptions/user?userId=${user?.id}`)
         if (!response.ok) throw new Error('Failed to fetch')
         const data = await response.json()
         setSubscriptions(data)
@@ -115,6 +126,7 @@ export default function UserDashboard() {
 
     fetchSubscriptions()
   }, [])
+
 
   useEffect(() => {
     setIsLoaded(true)
@@ -259,84 +271,50 @@ export default function UserDashboard() {
     }
     };
 
+  // Filter subscriptions based on status
+  const filteredSubscriptions = subscriptions.filter((sub) => {
+    if (statusFilter === "all") return true
+    return sub.status === statusFilter
+  })
 
   const activeSubscriptions = subscriptions.filter((sub) => sub.status === "active")
   const totalMonthlySpend = activeSubscriptions.reduce((sum, sub) => sum + sub.totalPrice, 0)
+
+  const getStatusCount = (status: string) => {
+    if (status === "all") return subscriptions.length
+    return subscriptions.filter((sub) => sub.status === status).length
+  }
 
   return (
 
     <div className="min-h-screen bg-background flex">
         
-      {/* Sidebar */}
-      <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 rounded-full">
-              <ChefHat className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">SEA Catering</span>
-          </Link>
-        </div>
+      {/* Desktop Sidebar */}
+      <UserSidebar className="hidden lg:flex" />
 
-        {/* User Profile */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src="/images/placeholder/avatar-1.png" />
-              <AvatarFallback>JD</AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="font-semibold">{user?.name}</div>
-              <div className="text-sm text-muted-foreground">{user?.email}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {sidebarItems.map((item, index) => {
-              const IconComponent = item.icon
-              return (
-                <li key={index}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                      item.active
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400"
-                        : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    <IconComponent className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
-
-        {/* Logout */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-          <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
-            <LogOut className="h-5 w-5 mr-3" />
-            Sign Out
+      {/* Mobile Sidebar */}
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="lg:hidden fixed top-4 left-4 z-50">
+            <Menu className="h-6 w-6" />
           </Button>
-        </div>
-      </div>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-64">
+          <UserSidebar />
+        </SheetContent>
+      </Sheet>
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-4 lg:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="ml-12 lg:ml-0">
               <h1 className="text-2xl font-bold">Dashboard</h1>
               <p className="text-muted-foreground">Manage your meal subscriptions and preferences</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button variant="outline" size="sm" className="hidden sm:flex">
                 <Bell className="h-4 w-4 mr-2" />
                 Notifications
               </Button>
@@ -351,72 +329,105 @@ export default function UserDashboard() {
         </header>
 
         {/* Dashboard Content */}
-        <div className="p-6 space-y-8">
+        <div className="p-4 lg:p-6 space-y-6 lg:space-y-8">
           {/* Stats Cards */}
           <div
-            className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-1000 ${
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 transition-all duration-1000 ${
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
             <Card className="hover:shadow-lg transition-all duration-300">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Active Subscriptions</p>
-                    <p className="text-3xl font-bold text-emerald-600">{activeSubscriptions.length}</p>
+                    <p className="text-2xl lg:text-3xl font-bold text-emerald-600">{activeSubscriptions.length}</p>
                   </div>
-                  <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-6 w-6 text-emerald-600" />
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="hover:shadow-lg transition-all duration-300">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Monthly Spend</p>
-                    <p className="text-3xl font-bold text-orange-600">{formatPrice(totalMonthlySpend)}</p>
+                    <p className="text-xl lg:text-3xl font-bold text-orange-600">{formatPrice(totalMonthlySpend)}</p>
                   </div>
-                  <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
-                    <CreditCard className="h-6 w-6 text-orange-600" />
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-5 w-5 lg:h-6 lg:w-6 text-orange-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-all duration-300">
-              <CardContent className="p-6">
+            <Card className="hover:shadow-lg transition-all duration-300 sm:col-span-2 lg:col-span-1">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Next Delivery</p>
-                    <p className="text-3xl font-bold text-purple-600">Today</p>
+                    <p className="text-2xl lg:text-3xl font-bold text-purple-600">Today</p>
                   </div>
-                  <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
-                    <CalendarIcon className="h-6 w-6 text-purple-600" />
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
+                    <CalendarIcon className="h-5 w-5 lg:h-6 lg:w-6 text-purple-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Active Subscriptions */}
+          {/* Subscription Filters and List */}
+
           <div
             className={`transition-all duration-1000 delay-200 ${
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <h2 className="text-xl font-bold">Your Subscriptions</h2>
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                View All
-              </Button>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium hidden sm:inline">Filter by status:</span>
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32 sm:w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All ({getStatusCount("all")})</SelectItem>
+                    <SelectItem value="active">Active ({getStatusCount("active")})</SelectItem>
+                    <SelectItem value="paused">Paused ({getStatusCount("paused")})</SelectItem>
+                    <SelectItem value="cancelled">Cancelled ({getStatusCount("cancelled")})</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="grid gap-6">
-              {subscriptions.map((subscription, index) => {
+            {filteredSubscriptions.length === 0 ? (
+              <Card className="p-8 text-center">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Utensils className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No subscriptions found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {statusFilter === "all"
+                    ? "You don't have any subscriptions yet."
+                    : `You don't have any ${statusFilter} subscriptions.`}
+                </p>
+                <Link href={"/subscription"}>
+                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Utensils className="h-4 w-4 mr-2" />
+                    Create New Subscription
+                  </Button>
+                </Link>
+              </Card>
+            ) : (
+              <div className="grid gap-4 lg:gap-6">
+                {filteredSubscriptions.map((subscription, index) => {
                 const PlanIcon = getPlanIcon(subscription.planType)
                 const planColor = getPlanColor(subscription.planType)
 
@@ -429,10 +440,8 @@ export default function UserDashboard() {
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
                     <CardContent className="p-0">
-                      <div className="flex">
-                        {/* Plan Info */}
-                        <div className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-4">
+                     <div className="p-4 lg:p-6">
+                          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4">
                             <div className="flex items-center space-x-4">
                               <div
                                 className={`w-16 h-16 rounded-xl flex items-center justify-center ${
@@ -546,7 +555,7 @@ export default function UserDashboard() {
                           </div>
 
                           {/* Subscription Details */}
-                          <div className="grid md:grid-cols-3 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
                             <div>
                               <h4 className="font-semibold mb-2 text-sm text-muted-foreground">MEAL TYPES</h4>
                               <div className="space-y-1">
@@ -585,7 +594,6 @@ export default function UserDashboard() {
                                     Paused until: {new Date(subscription.pausedUntil).toLocaleDateString()}
                                   </div>
                                 )}
-                              </div>
                             </div>
                           </div>
                         </div>
@@ -595,6 +603,7 @@ export default function UserDashboard() {
                 )
               })}
             </div>
+            )}
           </div>
 
           {/* Quick Actions */}
@@ -604,37 +613,44 @@ export default function UserDashboard() {
             }`}
           >
             <h2 className="text-xl font-bold mb-6">Quick Actions</h2>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
 
-              <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-6 text-center" onClick={() => router.push("/subscription")}>
-                  <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <Utensils className="h-8 w-8 text-emerald-600" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Add New Plan</h3>
-                  <p className="text-sm text-muted-foreground">Subscribe to additional meal plans</p>
-                </CardContent>
-              </Card>
+              <Link href={"/subscription"}>
+                <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-4 lg:p-6 text-center">
+                    <div className="w-12 h-12 lg:w-16 lg:h-16 bg-emerald-100 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <Utensils className="h-6 w-6 lg:h-8 lg:w-8 text-emerald-600" />
+                    </div>
+                    <h3 className="font-semibold mb-2">Add New Plan</h3>
+                    <p className="text-sm text-muted-foreground">Subscribe to additional meal plans</p>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-6 text-center" onClick={() => router.push("/menu")}>
-                  <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <CalendarIcon className="h-8 w-8 text-orange-600" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Check Menu Plan</h3>
-                  <p className="text-sm text-muted-foreground">Explore SEA Catering Menu Plan</p>
-                </CardContent>
-              </Card>
+              <Link href={"/menu"}>
+                <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-4 lg:p-6 text-center">
+                    <div className="w-12 h-12 lg:w-16 lg:h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <CalendarIcon className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600" />
+                    </div>
+                    <h3 className="font-semibold mb-2">Check Menu Plan</h3>
+                    <p className="text-sm text-muted-foreground">Explore SEA Catering Menu Plan</p>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-6 text-center" onClick={() => router.push("/contact")}>
-                  <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <HelpCircle className="h-8 w-8 text-purple-600" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Get Support</h3>
-                  <p className="text-sm text-muted-foreground">Contact our customer service team</p>
-                </CardContent>
-              </Card>
+              <Link href={"/contact"}>
+                <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-4 lg:p-6 text-center">
+                    <div className="w-12 h-12 lg:w-16 lg:h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <Bell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600" />
+                    </div>
+                    <h3 className="font-semibold mb-2">Get Support</h3>
+                    <p className="text-sm text-muted-foreground">Contact our customer service team</p>
+                  </CardContent>
+                </Card>
+              </Link>
+
             </div>
           </div>
         </div>
