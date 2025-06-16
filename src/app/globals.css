@@ -118,3 +118,29 @@
 nextjs-portal {
   display: none !important;
 }
+
+
+
+@keyframes float-icon-1 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(10px, -10px) rotate(5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes float-icon-2 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-10px, 10px) rotate(-5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes float-icon-3 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(15px, -5px) rotate(8deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes ping-static {
+  0% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.5; transform: scale(1); }
+}
