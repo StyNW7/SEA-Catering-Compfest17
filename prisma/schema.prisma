@@ -96,6 +96,7 @@ model Testimonial {
 
 }
 
+/*
 model SubscriptionHistory {
   id             String     @id @default(cuid())
   subscriptionId String
@@ -104,3 +105,4 @@ model SubscriptionHistory {
   
   subscription Subscription @relation(fields: [subscriptionId], references: [id])
 }
+*/
