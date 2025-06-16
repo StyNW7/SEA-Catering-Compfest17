@@ -8,7 +8,6 @@ export default function RouteTransitionHandler() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // This empty effect just triggers re-renders on route changes
   }, [pathname, searchParams])
 
   return null

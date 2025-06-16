@@ -33,7 +33,7 @@ export default function LoadingWrapper({ children }: { children: React.ReactNode
     }, 2000)
 
     return () => clearTimeout(timer)
-  }, [pathname, searchParams]) // Trigger on route changes
+  }, [pathname, searchParams])
 
   return (
     <>
