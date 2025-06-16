@@ -125,7 +125,7 @@ export default function UserDashboard() {
     }
 
     fetchSubscriptions()
-  }, [])
+  }, [user?.id])
 
 
   useEffect(() => {

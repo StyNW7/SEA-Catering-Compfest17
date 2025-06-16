@@ -300,13 +300,6 @@ export default function AdminDashboard() {
   }
   }, [dateRange]);
 
-  // Refetch metrics when date range changes
-  useEffect(() => {
-    if (isLoaded) {
-      fetchAllData()
-    }
-  }, [])
-
   // Period buttons
   const periodButtons = [
     { label: "7D", value: "7d" },
@@ -318,14 +311,6 @@ export default function AdminDashboard() {
 
   // Colors for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
-
-  if (user == null) {
-    router.push("/")
-  }
-
-  else if (user?.role === "USER") {
-    router.push("/dashboard")
-  }
 
   return (
     
