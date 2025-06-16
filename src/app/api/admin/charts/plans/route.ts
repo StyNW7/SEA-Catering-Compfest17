@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { parseISO } from 'date-fns'
 import { getServerSession } from '@/lib/session'
 
 export async function GET(request: Request) {
@@ -15,40 +15,65 @@ export async function GET(request: Request) {
       )
     }
 
-    // First get all meal plans with their active subscription counts
-    const mealPlans = await prisma.mealPlan.findMany({
+    const { searchParams } = new URL(request.url)
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+
+    const whereClause: any = {
+      status: 'active'
+    }
+
+    if (from && to) {
+      whereClause.OR = [
+        {
+          createdAt: {
+            lte: parseISO(to)
+          },
+          endDate: null
+        },
+        {
+          createdAt: {
+            lte: parseISO(to)
+          },
+          endDate: {
+            gte: parseISO(from)
+          }
+        }
+      ]
+    }
+
+    const planDistribution = await prisma.mealPlan.findMany({
       select: {
         id: true,
         name: true,
-        category: true, // Using category instead of color
+        category: true,
         _count: {
           select: {
             subscriptions: {
-              where: {
-                status: 'active'
-              }
+              where: whereClause
             }
           }
+        }
+      },
+      orderBy: {
+        subscriptions: {
+          _count: 'desc'
         }
       }
     })
 
-    // Map categories to colors
     const categoryColors: Record<string, string> = {
-      'weight-loss': '#10b981',    // Green
-      'muscle-building': '#f97316', // Orange
-      'balanced': '#3b82f6',       // Blue
-      'premium': '#8b5cf6'         // Purple
+      'weight-loss': '#10b981',
+      'muscle-building': '#f97316',
+      'balanced': '#3b82f6',
+      'premium': '#8b5cf6'
     }
 
-    // Then format and sort the data
-    const formattedData = mealPlans
-      .map((plan: { name: any; _count: { subscriptions: any }; category: string | number }) => ({
-        name: plan.name,
-        value: plan._count.subscriptions,
-        color: categoryColors[plan.category] || '#8884d8' // Default color
-      }))
-      .sort((a: { value: number }, b: { value: number }) => b.value - a.value) // Sort by count descending
+    const formattedData = planDistribution.map((plan) => ({
+      name: plan.name,
+      value: plan._count.subscriptions,
+      color: categoryColors[plan.category] || '#8884d8'
+    }))
 
     return NextResponse.json(formattedData)
   } catch (error) {

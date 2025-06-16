@@ -214,50 +214,67 @@ export default function AdminDashboard() {
     }
   }
 
-  // Fetch revenue chart data
   const fetchRevenueData = async () => {
     try {
-      const response = await fetch('/api/admin/charts/revenue?months=6')
-      if (!response.ok) throw new Error('Failed to fetch revenue data')
+      if (!dateRange.from || !dateRange.to) return;
       
-      const data = await response.json()
-      setRevenueData(data)
-    } catch {
-      toast('Error',{
-        description: 'Failed to load revenue data',
-      })
+      const from = format(dateRange.from, 'yyyy-MM-dd');
+      const to = format(dateRange.to, 'yyyy-MM-dd');
+      
+      const response = await fetch(`/api/admin/charts/revenue?from=${from}&to=${to}`);
+      if (!response.ok) throw new Error('Failed to fetch revenue data');
+      
+      const data = await response.json();
+      setRevenueData(data);
+    } catch (error) {
+      toast.error('Failed to load revenue data');
+      console.error(error);
     }
-  }
+  };
 
-  // Fetch growth chart data
+  // Fetch growth chart data with date range
   const fetchGrowthData = async () => {
     try {
-      const response = await fetch('/api/admin/charts/growth?days=30')
-      if (!response.ok) throw new Error('Failed to fetch growth data')
+      if (!dateRange.from || !dateRange.to) return;
       
-      const data = await response.json()
-      setGrowthData(data)
-    } catch {
-      toast('Error',{
-        description: 'Failed to load growth data',
-      })
+      const from = format(dateRange.from, 'yyyy-MM-dd');
+      const to = format(dateRange.to, 'yyyy-MM-dd');
+      
+      // Can optionally add interval parameter
+      const response = await fetch(
+        `/api/admin/charts/growth?from=${from}&to=${to}&interval=week`
+      );
+      if (!response.ok) throw new Error('Failed to fetch growth data');
+      
+      const data = await response.json();
+      setGrowthData(data);
+    } catch (error) {
+      toast.error('Failed to load growth data');
+      console.error(error);
     }
-  }
+  };
 
-  // Fetch plan distribution data
+  // Fetch plan distribution data with optional date range
   const fetchPlanData = async () => {
     try {
-      const response = await fetch('/api/admin/charts/plans')
-      if (!response.ok) throw new Error('Failed to fetch plan data')
+      let url = '/api/admin/charts/plans';
       
-      const data = await response.json()
-      setPlanData(data)
-    } catch {
-      toast('Error',{
-        description: 'Failed to load plan distribution data',
-      })
+      if (dateRange.from && dateRange.to) {
+        const from = format(dateRange.from, 'yyyy-MM-dd');
+        const to = format(dateRange.to, 'yyyy-MM-dd');
+        url += `?from=${from}&to=${to}`;
+      }
+      
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch plan data');
+      
+      const data = await response.json();
+      setPlanData(data);
+    } catch (error) {
+      toast.error('Failed to load plan distribution data');
+      console.error(error);
     }
-  }
+  };
 
   // Fetch all data
   const fetchAllData = async () => {
@@ -343,7 +360,7 @@ export default function AdminDashboard() {
                 <Download className="h-4 w-4 mr-2" />
                 Export Data
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={fetchAllData}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
@@ -427,7 +444,7 @@ export default function AdminDashboard() {
                     <p className="text-3xl font-bold text-emerald-600">{formatNumber(metrics.newSubscriptions)}</p>
                     <div className="flex items-center mt-2">
                       <ArrowUpRight className="h-4 w-4 text-emerald-600 mr-1" />
-                      <span className="text-sm text-emerald-600 font-medium">+{metrics.newSubscriptionsChange}%</span>
+                      <span className="text-sm text-emerald-600 font-medium">+{metrics.newSubscriptionsChange.toFixed(2)}%</span>
                       <span className="text-sm text-muted-foreground ml-1">vs last period</span>
                     </div>
                   </div>
@@ -447,7 +464,7 @@ export default function AdminDashboard() {
                     <p className="text-3xl font-bold text-orange-600">{formatPrice(metrics.mrr)}</p>
                     <div className="flex items-center mt-2">
                       <ArrowUpRight className="h-4 w-4 text-orange-600 mr-1" />
-                      <span className="text-sm text-orange-600 font-medium">+{metrics.mrrChange}%</span>
+                      <span className="text-sm text-orange-600 font-medium">+{metrics.mrrChange.toFixed(2)}%</span>
                       <span className="text-sm text-muted-foreground ml-1">vs last period</span>
                     </div>
                   </div>
@@ -467,7 +484,7 @@ export default function AdminDashboard() {
                     <p className="text-3xl font-bold text-purple-600">{formatNumber(metrics.reactivations)}</p>
                     <div className="flex items-center mt-2">
                       <ArrowDownRight className="h-4 w-4 text-red-600 mr-1" />
-                      <span className="text-sm text-red-600 font-medium">{metrics.reactivationsChange}%</span>
+                      <span className="text-sm text-red-600 font-medium">{metrics.reactivationsChange.toFixed(2)}%</span>
                       <span className="text-sm text-muted-foreground ml-1">vs last period</span>
                     </div>
                   </div>
@@ -487,7 +504,7 @@ export default function AdminDashboard() {
                     <p className="text-3xl font-bold text-blue-600">{formatNumber(metrics.activeSubscriptions)}</p>
                     <div className="flex items-center mt-2">
                       <ArrowUpRight className="h-4 w-4 text-blue-600 mr-1" />
-                      <span className="text-sm text-blue-600 font-medium">+{metrics.activeSubscriptionsChange}%</span>
+                      <span className="text-sm text-blue-600 font-medium">+{metrics.activeSubscriptionsChange.toFixed(2)}%</span>
                       <span className="text-sm text-muted-foreground ml-1">vs last period</span>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { subDays, eachDayOfInterval, format } from 'date-fns'
+import { eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval, format, parseISO } from 'date-fns'
 import { getServerSession } from '@/lib/session'
 
 export async function GET(request: Request) {
@@ -15,31 +15,52 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url)
-    const days = parseInt(searchParams.get('days') || '30')
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+    const interval = searchParams.get('interval') || 'day' // day, week, or month
 
-    const endDate = new Date()
-    const startDate = subDays(endDate, days - 1)
+    if (!from || !to) {
+      return NextResponse.json(
+        { error: 'Date range parameters (from, to) are required' },
+        { status: 400 }
+      )
+    }
 
-    const daysInRange = eachDayOfInterval({
-      start: startDate,
-      end: endDate
-    })
+    const fromDate = parseISO(from)
+    const toDate = parseISO(to)
+
+    let dateIntervals: Date[];
+    
+    if (interval === 'month') {
+      dateIntervals = eachMonthOfInterval({ start: fromDate, end: toDate })
+    } else if (interval === 'week') {
+      dateIntervals = eachWeekOfInterval({ start: fromDate, end: toDate })
+    } else {
+      // Default to daily
+      dateIntervals = eachDayOfInterval({ start: fromDate, end: toDate })
+    }
 
     const growthData = await Promise.all(
-      daysInRange.map(async (date) => {
-        const nextDay = new Date(date)
-        nextDay.setDate(nextDay.getDate() + 1)
+      dateIntervals.map(async (startDate) => {
+        const endDate = new Date(startDate)
+        if (interval === 'month') {
+          endDate.setMonth(endDate.getMonth() + 1)
+        } else if (interval === 'week') {
+          endDate.setDate(endDate.getDate() + 7)
+        } else {
+          endDate.setDate(endDate.getDate() + 1)
+        }
 
         const [active, newSubs, cancelled] = await Promise.all([
           prisma.subscription.count({
             where: {
               status: 'active',
               createdAt: {
-                lte: nextDay
+                lte: endDate
               },
               OR: [
                 { endDate: null },
-                { endDate: { gte: date } }
+                { endDate: { gte: startDate } }
               ]
             }
           }),
@@ -47,8 +68,8 @@ export async function GET(request: Request) {
             where: {
               status: 'active',
               createdAt: {
-                gte: date,
-                lt: nextDay
+                gte: startDate,
+                lt: endDate
               }
             }
           }),
@@ -56,15 +77,16 @@ export async function GET(request: Request) {
             where: {
               status: 'cancelled',
               updatedAt: {
-                gte: date,
-                lt: nextDay
+                gte: startDate,
+                lt: endDate
               }
             }
           })
         ])
 
         return {
-          date: format(date, 'yyyy-MM-dd'),
+          date: format(startDate, interval === 'month' ? 'MMM yyyy' : 
+                      interval === 'week' ? 'MMM dd, yyyy' : 'yyyy-MM-dd'),
           active,
           new: newSubs,
           cancelled

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { subMonths, eachMonthOfInterval, format } from 'date-fns'
+import { eachMonthOfInterval, format, parseISO } from 'date-fns'
 import { getServerSession } from '@/lib/session'
 
 export async function GET(request: Request) {
@@ -15,14 +15,23 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url)
-    const months = parseInt(searchParams.get('months') || '6')
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
 
-    const endDate = new Date()
-    const startDate = subMonths(endDate, months - 1)
+    if (!from || !to) {
+      return NextResponse.json(
+        { error: 'Date range parameters (from, to) are required' },
+        { status: 400 }
+      )
+    }
 
+    const fromDate = parseISO(from)
+    const toDate = parseISO(to)
+
+    // Generate all months in the range
     const monthsInRange = eachMonthOfInterval({
-      start: startDate,
-      end: endDate
+      start: fromDate,
+      end: toDate
     })
 
     const revenueData = await Promise.all(
@@ -50,7 +59,7 @@ export async function GET(request: Request) {
         })
 
         return {
-          month: format(monthStart, 'MMM'),
+          month: format(monthStart, 'MMM yyyy'),
           revenue: result._sum.totalPrice || 0,
           subscriptions: result._count.id
         }
