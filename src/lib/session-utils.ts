@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { env } from '@/../env'
 
-const algorithm = 'aes-256-cbc'
+// Use Web Crypto API available in both Node and Edge
+const crypto = globalThis.crypto || require('@peculiar/webcrypto').Crypto
 
 // Validate session secret exists and is the correct length
-function getSessionSecret(): Buffer {
-  const secretKey = process.env.SESSION_SECRET
+function getSessionKey(): Promise<CryptoKey> {
+  const secretKey = env.SESSION_SECRET
   if (!secretKey) {
     throw new Error('SESSION_SECRET environment variable is not set')
   }
@@ -15,19 +17,32 @@ function getSessionSecret(): Buffer {
     throw new Error('SESSION_SECRET must be 64-character hex string (32 bytes)')
   }
 
-  return Buffer.from(secretKey, 'hex')
+  // Convert hex string to ArrayBuffer
+  const keyBuffer = new Uint8Array(
+    secretKey.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+  );
+
+  return crypto.subtle.importKey(
+    'raw',
+    keyBuffer,
+    { name: 'AES-CBC' },
+    false,
+    ['encrypt', 'decrypt']
+  )
 }
 
 export async function encrypt(payload: any): Promise<string> {
   try {
-    const iv = randomBytes(16)
-    const secretKey = getSessionSecret()
-    const cipher = createCipheriv(algorithm, secretKey, iv)
+    const iv = crypto.getRandomValues(new Uint8Array(16))
+    const key = await getSessionKey()
     
-    let encrypted = cipher.update(JSON.stringify(payload), 'utf8', 'hex')
-    encrypted += cipher.final('hex')
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-CBC', iv },
+      key,
+      new TextEncoder().encode(JSON.stringify(payload))
+    )
     
-    return `${iv.toString('hex')}:${encrypted}`
+    return `${Buffer.from(iv).toString('hex')}:${Buffer.from(new Uint8Array(encrypted)).toString('hex')}`
   } catch (error) {
     console.error('Encryption failed:', error)
     throw new Error('Failed to encrypt session data')
@@ -36,15 +51,18 @@ export async function encrypt(payload: any): Promise<string> {
 
 export async function decrypt(session: string): Promise<any> {
   try {
-    const [ivHex, encrypted] = session.split(':')
-    const iv = Buffer.from(ivHex, 'hex')
-    const secretKey = getSessionSecret()
+    const [ivHex, encryptedHex] = session.split(':')
+    const iv = Uint8Array.from(Buffer.from(ivHex, 'hex'))
+    const encrypted = Uint8Array.from(Buffer.from(encryptedHex, 'hex'))
+    const key = await getSessionKey()
     
-    const decipher = createDecipheriv(algorithm, secretKey, iv)
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8')
-    decrypted += decipher.final('utf8')
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-CBC', iv },
+      key,
+      encrypted
+    )
     
-    return JSON.parse(decrypted)
+    return JSON.parse(new TextDecoder().decode(decrypted))
   } catch (error) {
     console.error('Decryption failed:', error)
     throw new Error('Failed to decrypt session data')

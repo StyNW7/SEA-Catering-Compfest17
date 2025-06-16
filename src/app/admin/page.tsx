@@ -51,6 +51,7 @@ import {
 } from "recharts"
 import { toast } from "sonner"
 import { useAuth } from "@/context/AuthContext"
+import { useRouter } from "next/navigation"
 
 interface DateRange {
   from: Date
@@ -126,6 +127,7 @@ const planDistributionData = [
 
 export default function AdminDashboard() {
 
+  const router = useRouter();
   const {user} = useAuth();
 
   const [isLoaded, setIsLoaded] = useState(false)
@@ -295,6 +297,13 @@ export default function AdminDashboard() {
   // Colors for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
 
+  if (user == null) {
+    router.push("/")
+  }
+
+  else if (user?.role === "USER") {
+    router.push("/dashboard")
+  }
 
   return (
     

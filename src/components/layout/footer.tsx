@@ -36,10 +36,10 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-gray-400">
-              <FooterLink href="#home" text="Home" />
-              <FooterLink href="#about" text="About" />
-              <FooterLink href="#services" text="Services" />
-              <FooterLink href="#contact" text="Contact" />
+              <FooterLink href="/" text="Home" />
+              <FooterLink href="/" text="About" />
+              <FooterLink href="/menu" text="Services" />
+              <FooterLink href="/contact" text="Contact" />
             </ul>
           </div>
 
@@ -47,10 +47,10 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Services</h4>
             <ul className="space-y-2 text-gray-400">
-              <FooterLink href="#" text="Weight Loss Plan" />
-              <FooterLink href="#" text="Muscle Building" />
-              <FooterLink href="#" text="Balanced Nutrition" />
-              <FooterLink href="#" text="Custom Plans" />
+              <FooterLink href="/menu" text="Diet Plan" />
+              <FooterLink href="/menu" text="Protein Plan" />
+              <FooterLink href="/menu" text="Royal Plan" />
+              <FooterLink href="/subscription" text="Subscription" />
             </ul>
           </div>
 

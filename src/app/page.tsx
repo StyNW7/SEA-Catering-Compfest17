@@ -73,12 +73,16 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
-                  Start Your Journey
-                </Button>
-                <Button size="lg" variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
-                  View Menu
-                </Button>
+                <Link href={"/subscription"}>
+                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                    Start Your Journey
+                  </Button>
+                </Link>
+                <Link href={"/menu"}>
+                  <Button size="lg" variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                    View Menu
+                  </Button>
+                </Link>
               </div>
 
               <div className="flex items-center space-x-8 pt-4">
@@ -255,26 +259,26 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                title: "Weight Loss Plan",
+                title: "Diet Plan",
                 description:
                   "Carefully portioned meals designed to help you reach your weight loss goals while maintaining nutrition.",
-                price: "From Rp 150,000/day",
+                price: "From Rp 30,000/day",
                 features: ["Calorie controlled", "High protein", "Low carb options", "Nutritionist approved"],
                 popular: false,
               },
               {
-                title: "Muscle Building Plan",
+                title: "Protein Plan",
                 description:
                   "High-protein meals perfect for athletes and fitness enthusiasts looking to build lean muscle.",
-                price: "From Rp 200,000/day",
+                price: "From Rp 40,000/day",
                 features: ["High protein content", "Post-workout meals", "Balanced macros", "Performance focused"],
                 popular: true,
               },
               {
-                title: "Balanced Nutrition",
+                title: "Royal Plan",
                 description:
                   "Well-rounded meals for those who want to maintain a healthy lifestyle with delicious variety.",
-                price: "From Rp 120,000/day",
+                price: "From Rp 60,000/day",
                 features: ["Variety of cuisines", "Balanced nutrition", "Family friendly", "Flexible portions"],
                 popular: false,
               },
@@ -303,7 +307,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <Link href={"/menu"}>
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Choose Plan</Button>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white mt-4">Choose Plan</Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -630,13 +634,17 @@ export default function HomePage() {
               Catering.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 px-8">
-                <Zap className="h-5 w-5 mr-2" />
-                Start Your Journey Today
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8 hover:text-white">
-                View Sample Menu
-              </Button>
+              <Link href="/subscription">
+                <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 px-8">
+                  <Zap className="h-5 w-5 mr-2" />
+                  Start Your Journey Today
+                </Button>
+              </Link>
+              <Link href="/menu">
+                <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 px-8 hover:text-white">
+                  View Sample Menu
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

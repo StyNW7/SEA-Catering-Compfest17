@@ -27,6 +27,7 @@ import {
 
 import { Navbar } from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
+import Link from "next/link"
 
 const contactInfo = [
   {
@@ -38,7 +39,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email Addresses",
-    details: ["hello@seacatering.id", "support@seacatering.id"],
+    details: ["brian@seacatering.id", "support@seacatering.id"],
     description: "We respond within 2 hours",
   },
   {
@@ -405,9 +406,11 @@ export default function ContactPage() {
                     Check out our FAQ section for instant answers to common questions about our meal plans, delivery,
                     and more.
                   </p>
-                  <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
-                    View FAQ
-                  </Button>
+                  <Link href={"/"}>
+                    <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                      View FAQ
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
 
@@ -449,7 +452,9 @@ export default function ContactPage() {
                 <MapPin className="h-16 w-16 text-emerald-600 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">SEA Catering Head Office</h3>
                 <p className="text-muted-foreground">Jl. Sudirman No. 123, Jakarta Pusat 10220</p>
-                <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white">Get Directions</Button>
+                <Link href={"https://www.google.com/maps/"}>
+                    <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white">Get Directions</Button>
+                </Link>
               </div>
             </div>
           </Card>
