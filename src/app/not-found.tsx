@@ -1,9 +1,7 @@
-// src/app/not-found.tsx
-
-"use client"; // This must be the very first line for a client component
+"use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button"; // Assuming your Button component
+import { Button } from "@/components/ui/button";
 import { ChefHat, Home, Search, ArrowLeft, Utensils, Heart, Star } from "lucide-react";
 
 export default function NotFound() {

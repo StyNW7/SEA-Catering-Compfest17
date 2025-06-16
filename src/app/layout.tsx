@@ -7,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext"
 import { Suspense } from "react"
 import LoadingWrapper from "@/components/utils/loading-wrapper"
 import RouteTransitionHandler from "@/components/utils/RouteTransitionHandler"
+import { Loader2Icon } from "lucide-react"
 
 // import { ThemeProvider } from "@/components/theme-provider"
 
@@ -29,29 +30,19 @@ export default function RootLayout({
 
         <AuthProvider>
 
-          <RouteTransitionHandler />
-
-          {/* <Suspense fallback={
-            <LoadingWrapper>
-              <div />
-            </LoadingWrapper>
-          }>
-
-            <LoadingWrapper>
-              {children}
-              <Toaster/>
-            </LoadingWrapper>
-          </Suspense> */}
-
           <Suspense fallback={
             <LoadingWrapper>
-              <div className="flex items-center justify-center h-screen">
-                Loading...
+              <div className="flex justify-center items-center h-screen-minus-nav">
+                <Loader2Icon className="h-10 w-10 animate-spin text-primary" />
               </div>
             </LoadingWrapper>
           }>
-            {children}
-            <Toaster/>
+
+            <LoadingWrapper>
+              <RouteTransitionHandler />
+              {children}
+              <Toaster/>
+            </LoadingWrapper>
           </Suspense>
 
         </AuthProvider>

@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import LoadingScreen from "@/components/utils/loading-screen"
 
 export default function LoadingWrapper({ children }: { children: React.ReactNode }) {
+
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Preparing your healthy meals...")
   const [loadingKey, setLoadingKey] = useState(0) // Add key state
