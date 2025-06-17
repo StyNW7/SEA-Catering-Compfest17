@@ -30,6 +30,7 @@ import Footer from "@/components/layout/footer"
 import { toast } from "sonner"
 import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
+import { getClientCookie } from "@/utils/cookie"
 
 interface Testimonial {
   id: string
@@ -119,11 +120,26 @@ export default function TestimonialsPage() {
   const totalPages = Math.ceil(filteredTestimonials.length / ITEMS_PER_PAGE)
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
   const paginatedTestimonials = filteredTestimonials.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined);
+    
+  useEffect(() => {
+    setIsLoaded(true);
+    const token = getClientCookie('x-csrf-token');
+    setClientCsrfToken(token);
+  }, []);
 
   const handleSubmitTestimonial = async (e: React.FormEvent) => {
 
     e.preventDefault()
     setIsSubmitting(true)
+
+    if (!clientCsrfToken) {
+      toast("Registration Failed!", {
+        description: "CSRF token not available. Please refresh the page.",
+      });
+      return;
+    }
 
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -132,6 +148,7 @@ export default function TestimonialsPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': clientCsrfToken,
         },
         body: JSON.stringify(newTestimonial),
       })

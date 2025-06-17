@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
 import { useMobileMenu } from "@/hooks/useMobileMenu"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { getClientCookie } from "@/utils/cookie"
 
 export function Navbar() {
 
@@ -21,6 +24,35 @@ export function Navbar() {
     { href: "/testimonials", label: "Testimonials" },
     { href: "/contact", label: "Contact Us" },
   ]
+
+  const [, setIsLoaded] = useState(false)
+
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined)
+    
+  useEffect(() => {
+    setIsLoaded(true);
+    const token = getClientCookie('x-csrf-token');
+    setClientCsrfToken(token);
+  }, []);
+
+  const onSubmit = async () => {
+    try {
+
+      if (!clientCsrfToken) {
+        toast("Registration Failed!", {
+          description: "CSRF token not available. Please refresh the page.",
+        });
+        return;
+      }
+
+      await logout(clientCsrfToken)
+      toast.success("Logout Succeed!")
+    } catch (error) {
+      toast.error("Logout Failed!", {
+        description: error instanceof Error ? error.message : "Invalid credentials",
+      })
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -75,7 +107,7 @@ export function Navbar() {
 
             <Button
               variant="outline" className="text-emerald-600 hover:text-emerald-700 border-emerald-600 hover:bg-emerald-50"
-              onClick={logout}
+              onClick={onSubmit}
             >
               Logout
             </Button>
@@ -158,7 +190,7 @@ export function Navbar() {
                 <Button
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                   onClick={() => {
-                    logout()
+                    onSubmit()
                     closeMenu()
                   }}
                 >

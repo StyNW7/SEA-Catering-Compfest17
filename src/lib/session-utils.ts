@@ -2,10 +2,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { env } from '@/../env'
 
-// Use Web Crypto API available in both Node and Edge
 const crypto = globalThis.crypto || require('@peculiar/webcrypto').Crypto
 
-// Validate session secret exists and is the correct length
 function getSessionKey(): Promise<CryptoKey> {
   const secretKey = env.SESSION_SECRET
   if (!secretKey) {

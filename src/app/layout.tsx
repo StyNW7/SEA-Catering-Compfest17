@@ -37,13 +37,6 @@ export default function RootLayout({
             </LoadingWrapper>
           </Suspense>
 
-          {/* <LoadingWrapper>
-            <RouteTransitionHandler />
-            {children}
-          </LoadingWrapper> */}
-
-          <Toaster/>
-
         </AuthProvider>
 
       </body>

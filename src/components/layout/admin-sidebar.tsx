@@ -4,8 +4,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
+import { getClientCookie } from "@/utils/cookie"
 import { ChefHat, BarChart3, Users, DollarSign, CalendarIcon, Settings, Bell, HelpCircle, LogOut } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 const sidebarItems = [
   { icon: BarChart3, label: "Dashboard", href: "/admin", active: true },
@@ -24,7 +26,30 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ className }: AdminSidebarProps) {
 
-    const {user, logout} = useAuth();
+  const {user, logout} = useAuth();
+
+  const [, setIsLoaded] = useState(false)
+    
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined)
+    
+  useEffect(() => {
+    setIsLoaded(true);
+    const token = getClientCookie('x-csrf-token');
+    setClientCsrfToken(token);
+  }, []);
+
+  const onSubmit = async () => {
+    try {
+
+      if (!clientCsrfToken) {
+        return;
+      }
+
+      await logout(clientCsrfToken)
+    } catch (error) {
+      console.log("Error : " + error)
+    }
+  }
 
   return (
     <div
@@ -83,7 +108,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
 
       {/* Logout */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-        <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50" onClick={logout}>
+        <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50" onClick={onSubmit}>
           <LogOut className="h-5 w-5 mr-3" />
           Sign Out
         </Button>

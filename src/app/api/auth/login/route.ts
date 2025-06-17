@@ -6,7 +6,9 @@ import { loginSchema } from '@/lib/zod-schemas'
 import { createSession, User } from '@/lib/session'
 
 export async function POST(request: Request) {
+
   try {
+
     // Parse and validate input
     const body = await request.json()
     const validatedData = loginSchema.safeParse(body)
@@ -82,4 +84,5 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
+  
 }

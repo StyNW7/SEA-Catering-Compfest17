@@ -3,7 +3,6 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 type User = {
   id: string
@@ -17,8 +16,8 @@ type User = {
 type AuthContextType = {
   user: User | null
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+  login: (email: string, password: string, csrfToken: string) => Promise<void>
+  logout: (csrfToken: string) => Promise<void>
   checkAuth: () => Promise<void>
 }
 
@@ -52,13 +51,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, csrfToken: string) => {
     setIsLoading(true)
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({ email, password }),
       })
@@ -70,22 +70,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setUser(data.user)
-      toast.success('Login successful!')
       router.push('/')
     } catch (error: any) {
-      toast.error('Login failed', {
-        description: error.message || 'Invalid credentials',
-      })
       throw error
     } finally {
       setIsLoading(false)
     }
   }
 
-  const logout = async () => {
+  const logout = async (csrfToken: string) => {
     try {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
+        headers: {
+          'X-CSRF-Token': csrfToken,
+        },
       })
 
       if (!response.ok) {
@@ -93,12 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setUser(null)
-      toast.success('Logged out successfully')
       router.push('/auth/login')
     } catch (error: any) {
-      toast.error('Logout failed', {
-        description: error.message || 'Something went wrong',
-      })
+      console.log("Error : " + error)
     }
   }
 

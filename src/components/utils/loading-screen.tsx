@@ -6,7 +6,7 @@ import { ChefHat, Utensils, Heart, Leaf } from "lucide-react"
 interface LoadingScreenProps {
   isLoading?: boolean
   message?: string
-  key?: string | number  // Add key prop to force reset
+  key?: string | number 
 }
 
 type DotStyle = {
@@ -71,6 +71,7 @@ export default function LoadingScreen({
   if (!isLoading) return null
 
   return (
+    
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-orange-50 dark:from-emerald-950/90 dark:via-background dark:to-orange-950/90 backdrop-blur-sm">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">

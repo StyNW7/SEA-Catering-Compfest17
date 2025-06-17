@@ -3,16 +3,19 @@ import { prisma } from '@/lib/prisma'
 import { MealPlan } from '@/types/index'
 
 // Update Meal Plan
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
+
   try {
 
     const id = (await params).id; 
     const body: MealPlan = await request.json()
 
     // Verify meal plan exists
+
     const existingMealPlan = await prisma.mealPlan.findUnique({
       where: { id }
     })
@@ -49,6 +52,7 @@ export async function PUT(
     })
 
     return NextResponse.json(updatedMealPlan)
+
   } catch (error) {
     console.error('Error updating meal plan:', error)
     return NextResponse.json(
@@ -56,6 +60,7 @@ export async function PUT(
       { status: 500 }
     )
   }
+
 }
 
 // Delete Meal Plan
@@ -63,6 +68,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
+
   try {
     
     const id = (await params).id; 
@@ -95,4 +101,5 @@ export async function DELETE(
       { status: 500 }
     )
   }
+  
 }

@@ -7,6 +7,12 @@ async function main() {
 
   console.log('Seeding database...');
 
+  // Clear existing data
+  await prisma.testimonial.deleteMany();
+  await prisma.subscription.deleteMany();
+  await prisma.mealPlan.deleteMany();
+  await prisma.user.deleteMany();
+
   // Create an Admin User
   const hashedPassword = await bcrypt.hash('Admin@123', 10);
   const adminUser = await prisma.user.upsert({
@@ -19,6 +25,7 @@ async function main() {
       role: 'ADMIN',
     },
   });
+
   console.log('Admin user created:', adminUser);
 
   // Create a regular user
@@ -26,12 +33,13 @@ async function main() {
     where: { email: 'user@example.com' },
     update: {},
     create: {
-      name: 'John Doe',
+      name: 'Stanley Wijaya',
       email: 'user@example.com',
       password: await bcrypt.hash('User@123', 10),
       role: 'USER',
     },
   });
+
   console.log('Regular user created:', regularUser);
 
   // Create Meal Plans
@@ -100,6 +108,57 @@ async function main() {
 
   console.log(`Created ${mealPlans.count} meal plans`);
 
+  // Get all meal plans for subscription creation
+  const allMealPlans = await prisma.mealPlan.findMany();
+
+  // Create Subscriptions for regular user
+  const subscriptions = await prisma.subscription.createMany({
+    data: [
+      {
+        name: "John Doe",
+        phone: "08123456789",
+        mealTypes: ["breakfast", "lunch"],
+        deliveryDays: ["monday", "wednesday", "friday"],
+        allergies: "Peanuts, Shellfish",
+        userId: regularUser.id,
+        planId: allMealPlans[0].id,
+        status: 'active',
+        startDate: new Date(),
+        endDate: null,
+        totalPrice: 30000,
+      },
+      {
+        name: "John Doe",
+        phone: "08123456789",
+        mealTypes: ["breakfast", "lunch"],
+        deliveryDays: ["monday", "wednesday", "friday"],
+        allergies: "Peanuts, Shellfish",
+        userId: regularUser.id,
+        planId: allMealPlans[1].id,
+        status: 'paused',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        totalPrice: 30000,
+      },
+      {
+        name: "John Doe",
+        phone: "08123456789",
+        mealTypes: ["breakfast", "lunch"],
+        deliveryDays: ["monday", "wednesday", "friday"],
+        allergies: "Peanuts, Shellfish",
+        userId: regularUser.id,
+        planId: allMealPlans[2].id,
+        status: 'cancelled',
+        startDate: new Date(),
+        endDate: null,
+        totalPrice: 30000,
+      }
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log(`Created ${subscriptions.count} subscriptions for user ${regularUser.name}`);
+
   // Create Testimonials
   const testimonials = await prisma.testimonial.createMany({
     data: [
@@ -110,7 +169,7 @@ async function main() {
         message: "The Diet Plan has completely changed my eating habits. I have more energy and feel great!",
         plan: "Diet Plan",
         verified: true,
-        avatar: "/images/testimonials/sarah.jpg"
+        avatar: "/images/testimonial/avatar-2.png"
       },
       {
         name: "Michael Chen",
@@ -136,7 +195,7 @@ async function main() {
         message: "The Premium Gourmet Plan is worth every penny. It's like having a personal chef without the hassle!",
         plan: "Royal Plan",
         verified: true,
-        avatar: "/images/testimonials/emily.jpg"
+        avatar: "/images/testimonial/avatar-2.png"
       },
       {
         name: "Robert Kim",
