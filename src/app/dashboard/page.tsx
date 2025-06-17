@@ -33,6 +33,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { UserSidebar } from "@/components/layout/user-sidebar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAuth } from "@/context/AuthContext"
+import { getClientCookie } from "@/utils/cookie"
 
 interface Subscription {
   id: string
@@ -108,6 +109,14 @@ export default function UserDashboard() {
   // }, [])
   
 
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined)
+      
+  useEffect(() => {
+    setIsLoaded(true);
+    const token = getClientCookie('x-csrf-token');
+    setClientCsrfToken(token);
+  }, []);
+
   // Get specific user subscriptions only
 
   useEffect(() => {
@@ -168,12 +177,20 @@ export default function UserDashboard() {
 
 
   const handlePauseSubscription = async () => {
+
     if (!pauseStartDate || !pauseEndDate || !selectedSubscription) return;
+
+    if (!clientCsrfToken) {
+      toast("Registration Failed!", {
+        description: "CSRF token not available. Please refresh the page.",
+      });
+      return;
+    }
 
     try {
         const response = await fetch(`/api/subscriptions/${selectedSubscription}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': clientCsrfToken, },
         body: JSON.stringify({
             status: 'paused',
             endDate: pauseEndDate
@@ -208,67 +225,83 @@ export default function UserDashboard() {
     };
 
     const handleCancelSubscription = async () => {
-    try {
-        const response = await fetch(`/api/subscriptions/${selectedSubscription}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'cancelled' })
+
+      if (!clientCsrfToken) {
+        toast("Registration Failed!", {
+          description: "CSRF token not available. Please refresh the page.",
         });
+        return;
+      }
 
-        if (!response.ok) throw new Error('Failed to cancel subscription');
+      try {
+          const response = await fetch(`/api/subscriptions/${selectedSubscription}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': clientCsrfToken, },
+          body: JSON.stringify({ status: 'cancelled' })
+          });
 
-        const updatedSub = await response.json();
-        
-        setSubscriptions(prev => prev.map(sub => 
-        sub.id === updatedSub.id 
-            ? { 
-                ...updatedSub,
-                status: "cancelled",
-                totalPrice: sub.totalPrice
-            } 
-            : sub
-        ));
+          if (!response.ok) throw new Error('Failed to cancel subscription');
 
-        setCancelDialogOpen(false);
-        setSelectedSubscription("");
-        toast.success('Subscription cancelled');
-        
-    } catch {
-        toast.error('Failed to cancel subscription');
-    }
+          const updatedSub = await response.json();
+          
+          setSubscriptions(prev => prev.map(sub => 
+          sub.id === updatedSub.id 
+              ? { 
+                  ...updatedSub,
+                  status: "cancelled",
+                  totalPrice: sub.totalPrice
+              } 
+              : sub
+          ));
+
+          setCancelDialogOpen(false);
+          setSelectedSubscription("");
+          toast.success('Subscription cancelled');
+          
+      } catch {
+          toast.error('Failed to cancel subscription');
+      }
     };
 
     const handleReactivateSubscription = async (subscriptionId: string) => {
-    try {
-        const response = await fetch(`/api/subscriptions/${subscriptionId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            status: 'active',
-            endDate: null 
-        })
+
+      if (!clientCsrfToken) {
+        toast("Registration Failed!", {
+          description: "CSRF token not available. Please refresh the page.",
         });
+        return;
+      }
 
-        if (!response.ok) throw new Error('Failed to reactivate subscription');
+      try {
+          const response = await fetch(`/api/subscriptions/${subscriptionId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': clientCsrfToken,  },
+          body: JSON.stringify({ 
+              status: 'active',
+              endDate: null 
+          })
+          });
 
-        const updatedSub = await response.json();
-        
-        setSubscriptions(prev => prev.map(sub => 
-        sub.id === updatedSub.id 
-            ? { 
-                ...updatedSub,
-                status: "active",
-                pausedUntil: undefined,
-                totalPrice: sub.totalPrice
-            } 
-            : sub
-        ));
-        
-        toast.success('Subscription reactivated');
-        
-    } catch {
-        toast.error('Failed to reactivate subscription');
-    }
+          if (!response.ok) throw new Error('Failed to reactivate subscription');
+
+          const updatedSub = await response.json();
+          
+          setSubscriptions(prev => prev.map(sub => 
+          sub.id === updatedSub.id 
+              ? { 
+                  ...updatedSub,
+                  status: "active",
+                  pausedUntil: undefined,
+                  totalPrice: sub.totalPrice
+              } 
+              : sub
+          ));
+          
+          toast.success('Subscription reactivated');
+          
+      } catch {
+          toast.error('Failed to reactivate subscription');
+      }
     };
 
   // Filter subscriptions based on status

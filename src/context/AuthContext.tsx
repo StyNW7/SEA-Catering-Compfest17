@@ -3,7 +3,6 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 type User = {
   id: string
@@ -71,12 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setUser(data.user)
-      toast.success('Login successful!')
       router.push('/')
     } catch (error: any) {
-      toast.error('Login failed', {
-        description: error.message || 'Invalid credentials',
-      })
       throw error
     } finally {
       setIsLoading(false)
@@ -97,12 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setUser(null)
-      toast.success('Logged out successfully')
       router.push('/auth/login')
     } catch (error: any) {
-      toast.error('Logout failed', {
-        description: error.message || 'Something went wrong',
-      })
+      console.log("Error : " + error)
     }
   }
 

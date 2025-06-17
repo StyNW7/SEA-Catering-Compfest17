@@ -33,6 +33,7 @@ import Footer from "@/components/layout/footer"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { getClientCookie } from "@/utils/cookie"
 
 interface SubscriptionForm {
   name: string
@@ -106,6 +107,14 @@ export default function SubscriptionPage() {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+      
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined)
+    
+  useEffect(() => {
+    setIsLoaded(true);
+    const token = getClientCookie('x-csrf-token');
+    setClientCsrfToken(token);
+  }, []);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -183,12 +192,19 @@ export default function SubscriptionPage() {
 
     setIsSubmitting(true)
 
+    if (!clientCsrfToken) {
+      toast("Registration Failed!", {
+        description: "CSRF token not available. Please refresh the page.",
+      });
+      return;
+    }
+
     try {
       const response = await fetch('/api/subscriptions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // ...(user && { 'Authorization': `Bearer cmbxep9a90001vfl45r3vo390` })
+          'X-CSRF-Token': clientCsrfToken,
         },
         body: JSON.stringify({
           ...formData,
