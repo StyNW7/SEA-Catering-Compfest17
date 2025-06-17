@@ -19,6 +19,31 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 ---
 
+## 📃 Table of Contents
+- [Complete Documentation](#📚-complete-documentation)
+- [Technology Stack](#🛠️-technology-stack)
+- [Core Features](#🧩-core-features)
+- [Live Demo](#🚀-live-demo)
+- [Getting Started Locally](#🧰-getting-started-locally)
+- [env Configuration](#🔐-env-configuration)
+- [Screenshots](#🖼️-website-preview)
+- [Satzinger’s Diagram](#🧭-diagram)
+- [API Documentation](#🔥-api-documentation)
+- [Owner](#👥-owner)
+- [Contact](#📬-contact)
+
+---
+
+## 📚 Complete Documentation
+
+<ul>
+    <li><b>Notion Documentation (Detail Documentation)</b></li>
+    <a href="https://stanley-n-wijaya.notion.site/SEA-Catering-Documentation-20f73555b71f8045ae6dff108f41acc6?source=copy_link">SEA Catering Documentation</a>
+</ul>
+
+
+---
+
 ## Technology Stack
 
 <div align="center">
@@ -68,54 +93,19 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 ---
 
-## 📃 Table of Contents
-- [Complete Documentation](#📚-complete-documentation)
-- [Technology Stack](#🛠️-technology-stack)
-- [Core Features](#🧩-core-features)
-- [Live Demo](#🚀-live-demo)
-- [Getting Started Locally](#🧰-getting-started-locally)
-- [env Configuration](#🔐-env-configuration)
-- [Screenshots](#🖼️-website-preview)
-- [Satzinger’s Diagram](#🧭-diagram)
-- [API Documentation](#🔥-api-documentation)
-- [Owner](#👥-owner)
-- [Contact](#📬-contact)
-
----
-
-## 📚 Complete Documentation
-
-<ul>
-    <li><b>Notion Documentation (Detail Documentation)</b></li>
-    <a href="https://stanley-n-wijaya.notion.site/SEA-Catering-Documentation-20f73555b71f8045ae6dff108f41acc6?source=copy_link">SEA Catering Documentation</a>
-</ul>
-
-
----
-
-## 🛠️ Technology Stack
-- **Frontend**: React with Vite, TypeScript, TailwindCSS, ShadcnUI components
-- **Backend**: Rust + Tauri, SeaORM, and sqlx
-- **Database**: PostgreSQL
-- **Caching**: Redis for performance optimization
-- **API**: GraphQL integration for employee and branch synchronization (https://yoshikoya.vercel.app/api/graphql)
-- **Build Tools**: Cargo (Rust), NPM/Yarn (Node.js)
-
----
-
 ## 🧩 Core Features
 
 ### ✅ Level 1: Welcome to SEA Catering
 
 * Static homepage introducing SEA Catering
-* Slogan and business info
-* Contact: Brian – 08123456789
+* Good and Intuitive UI/UX Design
 
 ### ✅ Level 2: Making It Interactive
 
-* Responsive navbar (Home, Menu, Subscription, Contact Us)
+* Full Responsive Layout
 * Meal Plan cards with modals
 * Testimonials form + slider
+* Static Business Contact Page
 
 ### ✅ Level 3: Subscription System
 
@@ -162,7 +152,7 @@ git clone https://github.com/StyNW7/SEA-Catering-Compfest17.git
 cd sea-catering
 npm install
 npm run dev
-npm run buiild
+npm run build
 ```
 
 ---
@@ -171,7 +161,7 @@ npm run buiild
 
 Default Local Postgres SQL Server Port is: 5432 (But, you can check it manually)
 ```
-DATABASE_URL=postgres://username:password@localhost:5432/database_name
+DATABASE_URL=postgresql://username:password@localhost:5432/database_name?schema=public
 SESSION_SECRET=64_character_hex_string_here
 
 Generate Session Secret Key (helper):
@@ -186,7 +176,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 <table style="width:100%; text-align:center">
     <col width="100%">
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/home1.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/home-about.png"/></td>
     </tr>
     <tr>
         <td width="1%" align="center">Home Page 1</td>
