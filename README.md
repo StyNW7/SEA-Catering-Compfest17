@@ -163,10 +163,30 @@ Default Local Postgres SQL Server Port is: 5432 (But, you can check it manually)
 ```
 DATABASE_URL=postgresql://username:password@localhost:5432/database_name?schema=public
 SESSION_SECRET=64_character_hex_string_here
+```
 
-Generate Session Secret Key (helper):
+#### 🫙 PostgreSQL Database Configuration
+
+1. Install PostgreSQL Database
+2. Create Database (make sure you already have a server to make a database)
+3. Change the DATABASE_URL value based on your PostgreSQL Database Configuration
+
+#### 🫙 Session Secret Configuration
+
+📌 Generate Session Secret Key (helper):
+
+Run this on terminal
+```
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
+Then copy the string to the SESSION_SECRET value
+
+```
+Example:
+SESSION_SECRET=6aa80ec2ba7618442b7c11a92c88521b1f1bc182055733702622e561ce12024c
+```
+
+#### 🫙 .env.example
 
 📌 You can create these files manually or copy from a provided `.env.example` file (recommended but change it based on your local environment configuration).
 

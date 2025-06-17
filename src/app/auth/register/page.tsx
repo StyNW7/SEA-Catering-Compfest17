@@ -19,6 +19,18 @@ import { useAuth } from "@/context/AuthContext";
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
+// Helper function to get a cookie value on the client-side
+function getClientCookie(name: string): string | undefined {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for(let i=0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return undefined;
+}
+
 export default function RegisterPage() {
 
   const {user} = useAuth();
@@ -42,13 +54,32 @@ export default function RegisterPage() {
     setIsLoaded(true);
   }, []);
 
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setIsLoaded(true);
+    // Fetch the client-readable CSRF token from the cookie
+    const token = getClientCookie('x-csrf-token'); // Read the non-httpOnly cookie
+    setClientCsrfToken(token);
+    console.log("Client-side CSRF Token (x-csrf-token):", token)
+  }, []);
+
   const onSubmit = async (data: RegisterFormValues) => {
 
     try {
+
+      if (!clientCsrfToken) {
+        toast("Registration Failed!", {
+          description: "CSRF token not available. Please refresh the page.",
+        });
+        return;
+      }
+
       const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': clientCsrfToken,
         },
         body: JSON.stringify({
           fullName: data.fullName,

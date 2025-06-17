@@ -110,7 +110,7 @@ async function main() {
         message: "The Diet Plan has completely changed my eating habits. I have more energy and feel great!",
         plan: "Diet Plan",
         verified: true,
-        avatar: "/images/testimonials/sarah.jpg"
+        avatar: "/images/testimonial/avatar-2.png"
       },
       {
         name: "Michael Chen",
@@ -136,7 +136,7 @@ async function main() {
         message: "The Premium Gourmet Plan is worth every penny. It's like having a personal chef without the hassle!",
         plan: "Royal Plan",
         verified: true,
-        avatar: "/images/testimonials/emily.jpg"
+        avatar: "/images/testimonial/avatar-2.png"
       },
       {
         name: "Robert Kim",
