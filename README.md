@@ -176,76 +176,58 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 <table style="width:100%; text-align:center">
     <col width="100%">
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/web-preview/home-about.png"/></td>
+        <td width="1%" align="center"><img height="370" src="./img/web-preview/home-about.png"/></td>
     </tr>
     <tr>
-        <td width="1%" align="center">Home Page 1</td>
+        <td width="1%" align="center">Home Page | About Section</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/home2.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/home-founder.png"/></td>
     </tr>
     <tr>
-        <td width="1%" align="center">Home Page 2</td>
+        <td width="1%" align="center">Home Page | Founder Section</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/login.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/login.png"/></td>
     </tr>
     <tr>
         <td width="1%" align="center">Login Page</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/register.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/register.png"/></td>
     </tr>
     <tr>
         <td width="1%" align="center">Register Page</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/dashboard.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/menu-page.png"/></td>
     </tr>
     <tr>
-        <td width="1%" align="center">Dashboard</td>
+        <td width="1%" align="center">Menu Page</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/courses.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/testimonial-page.png"/></td>
     </tr>
     <tr>
-        <td width="1%" align="center">Courses</td>
+        <td width="1%" align="center">Testimonial Page</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/business.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/contact-page.png"/></td>
     </tr>
     <tr>
-        <td width="1%" align="center">Businesses</td>
+        <td width="1%" align="center">Contact Page</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/profile.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/user-dashboard-page.png"/></td>
     </tr>
     <tr>
-        <td width="1%" align="center">Profile</td>
+        <td width="1%" align="center">User Dashboard Page</td>
     </tr>
     <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/addCourse.png"/></td>
+        <td width="1%" align="center"><img height="400" src="./img/web-preview/admin-dashboard-page.png"/></td>
     </tr>
     <tr>
-        <td width="1%" align="center">Add Course</td>
-    </tr>
-    <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/courseDetail.png"/></td>
-    </tr>
-    <tr>
-        <td width="1%" align="center">Detail Course</td>
-    </tr>
-    <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/hiring.png"/></td>
-    </tr>
-    <tr>
-        <td width="1%" align="center">Hiring List</td>
-    </tr>
-    <tr>
-        <td width="1%" align="center"><img height="400" src="./img/demo/setup.png"/></td>
-    </tr>
-    <tr>
-        <td width="1%" align="center">Setup Profile</td>
+        <td width="1%" align="center">Admin Dashboard Page</td>
     </tr>
 </table>
 
@@ -255,7 +237,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 *Overall Database System Flow:*
 <p align="center">
-  <img src="./YoshiKoya-Diagrams/Diagram-Images/Rev-1-Phase/Class Diagram.png" width="700">
+  <img src="./img/diagram.png" width="700">
 </p>
 
 This diagram shows how the models connected using ERD Diagram
