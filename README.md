@@ -24,6 +24,7 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 - [Technology Stack](#🛠️-technology-stack)
 - [Core Features](#🧩-core-features)
 - [Live Demo](#🚀-live-demo)
+- [Account Information](#👤-account-information)
 - [Getting Started Locally](#🧰-getting-started-locally)
 - [env Configuration](#🔐-env-configuration)
 - [Screenshots](#🖼️-website-preview)
@@ -47,7 +48,7 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 ## Technology Stack
 
 <div align="center">
-<a href="https://react.dev/">
+<a href="https://nextjs.org/">
 <kbd>
 <img src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/next_js.png" height="60" />
 </kbd>
@@ -71,13 +72,13 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 </kbd>
 </a>
 
-<a href="https://tailwindcss.com/">
+<a href="https://www.postgresql.org/">
 <kbd>
 <img src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/postgresql.png" height="60" />
 </kbd>
 </a>
 
-<a href="https://ui.shadcn.com/">
+<a href="https://www.prisma.io/">
 <kbd>
 <img src="./img/tech/prisma.png" height="60" />
 </kbd>
@@ -93,12 +94,12 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 ---
 
-## 🧩 Core Features
+## 🧩 Core Features (based on criteria given)
 
 ### ✅ Level 1: Welcome to SEA Catering
 
 * Static homepage introducing SEA Catering
-* Good and Intuitive UI/UX Design
+* Add some details information of the website
 
 ### ✅ Level 2: Making It Interactive
 
@@ -122,7 +123,7 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 ### ✅ Level 4: Securing SEA
 
-* JWT Auth with hashed passwords
+* Authentication and Authorization with hashed passwords + Secure Middleware
 * Role-based Access (User & Admin)
 * Form validations and sanitizations (XSS, SQLi, CSRF)
 
@@ -131,11 +132,33 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 * Users: View, pause, cancel subscriptions
 * Admins: View subscription metrics, MRR, growth
 
+### ✅ BONUS
+
+* Good and Intuitive UI/UX Design
+* Deployment
+* Clean Code, Clean Project Architecture, Full Responsive, and complete README Documentation + Notion Documentation (for more detail info)
+
 ---
 
 ## 🚀 Live Demo
-Visit the live desktop app demo here:  
+Visit the live website demo here:  
 👉 https://sea-catering-compfest17.vercel.app/
+
+---
+
+## 👤 Account Information
+
+> [!TIP]
+> 
+> If you run it locally, just run the seeding. However, if you use the deployment this is accounts that you can use
+
+#### Admin Account
+- **Email**: admin@seacatering.com
+- **Password**: Admin@123
+
+#### User/Customer Account
+- **Email**: user@example.com
+- **Password**: User@123
 
 ---
 
@@ -144,15 +167,25 @@ Visit the live desktop app demo here:
 ### Prerequisites
 - **Node.js** (v14 or higher)
 - **PostgreSQL** (configured locally or remotely)
+- **PgAdmin** (optional)
 - **Git**
+- **Postman** (optional)
 
 ### Clone (Setup Locaclly)
 ```bash
 git clone https://github.com/StyNW7/SEA-Catering-Compfest17.git
 cd sea-catering
+(Dont forget to do .env configuration first)
+npm install -g prisma (Install prisma globally)
 npm install
 npm run dev
 npm run build
+```
+
+### Seeding Database
+```bash
+npx prisma migrate reset
+npm run prisma:migrate:dev
 ```
 
 ---
@@ -257,7 +290,7 @@ SESSION_SECRET=6aa80ec2ba7618442b7c11a92c88521b1f1bc182055733702622e561ce12024c
 
 *Overall Database System Flow:*
 <p align="center">
-  <img src="./img/diagram.png" width="700">
+  <img src="./img/SEA-Catering-Diagram.png" width="700">
 </p>
 
 This diagram shows how the models connected using ERD Diagram
@@ -268,7 +301,11 @@ This diagram shows how the models connected using ERD Diagram
 
 Postman Link:
 
-https://www.postman.com/xstynwx/sea-catering/collection/x1jzsah/users?action=share&creator=35383957
+[SEA-Catering Postman](https://www.postman.com/xstynwx/workspace/sea-catering/collection/35383957-51776816-238c-446f-ab19-03859a146316?action=share&creator=35383957&active-environment=35383957-a553cbd0-f21e-45fc-80ba-3ddfac927058)
+
+> [!TIP]
+> 
+> To use POST, PUT, DELETE, and PATCH Method. Don't forget to change the csrf environment secret token using Get-CSRF-Token Request
 
 ---
 
