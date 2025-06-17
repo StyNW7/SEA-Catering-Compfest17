@@ -27,7 +27,7 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 - [Account Information](#👤-account-information)
 - [Getting Started Locally](#🧰-getting-started-locally)
 - [env Configuration](#🔐-env-configuration)
-- [Screenshots](#🖼️-website-preview)
+- [Website Preview](#🖼️-website-preview)
 - [Satzinger’s Diagram](#🧭-diagram)
 - [API Documentation](#🔥-api-documentation)
 - [Owner](#👥-owner)
@@ -174,8 +174,9 @@ Visit the live website demo here:
 ### Clone (Setup Locaclly)
 ```bash
 git clone https://github.com/StyNW7/SEA-Catering-Compfest17.git
-cd sea-catering
+cd sea-catering-compfest17
 (Dont forget to do .env configuration first)
+(Dont forget to seeding the database optional but very recommended)
 npm install -g prisma (Install prisma globally)
 npm install
 npm run dev
@@ -305,7 +306,7 @@ Postman Link:
 
 > [!TIP]
 > 
-> To use POST, PUT, DELETE, and PATCH Method. Don't forget to change the csrf environment secret token using Get-CSRF-Token Request
+> To use POST, PUT, DELETE, and PATCH Method. First change the csrf environment secret token using Get-CSRF-Token Request
 
 ---
 
