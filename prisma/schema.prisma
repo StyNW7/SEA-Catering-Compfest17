@@ -95,14 +95,3 @@ model Testimonial {
   user        User?    @relation(fields: [customerId], references: [id])
 
 }
-
-/*
-model SubscriptionHistory {
-  id             String     @id @default(cuid())
-  subscriptionId String
-  status         String
-  changedAt      DateTime   @default(now())
-  
-  subscription Subscription @relation(fields: [subscriptionId], references: [id])
-}
-*/

@@ -5,7 +5,9 @@ import { MealPlan } from '@/types/index'
 // Create Meal Plan
 
 export async function POST(request: Request) {
+
   try {
+
     const body: MealPlan = await request.json()
 
     // Validate required fields
@@ -40,6 +42,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(mealPlan, { status: 201 })
+
   } catch (error) {
     console.error('Error creating meal plan:', error)
     return NextResponse.json(
@@ -47,6 +50,7 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
+
 }
 
 // Get all meal plans
@@ -76,4 +80,3 @@ export async function GET(request: Request) {
     )
   }
 }
-

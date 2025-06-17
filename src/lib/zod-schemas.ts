@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // --- Authentication Schemas ---
 export const registerSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"), // Changed to fullName
+  fullName: z.string().min(1, "Full name is required"),
   email: z.string().email("Invalid email address"),
   password: z
     .string()
@@ -25,7 +25,7 @@ export const subscriptionSchema = z.object({
     .string()
     .min(10, "Phone number must be at least 10 digits")
     .regex(/^\d+$/, "Phone number must contain only digits"),
-  planId: z.string().min(1, "Meal plan selection is required"), // Assuming this will be a MealPlan ID
+  planId: z.string().min(1, "Meal plan selection is required"),
   mealTypes: z.array(z.string()).min(1, "At least one meal type must be selected"),
   deliveryDays: z.array(z.string()).min(1, "At least one delivery day must be selected"),
   allergies: z.string().optional(),
@@ -40,6 +40,6 @@ export const testimonialSchema = z.object({
 
 // --- Admin Dashboard Filtering Schema ---
 export const dashboardFilterSchema = z.object({
-  startDate: z.string().optional(), // ISO date string
-  endDate: z.string().optional(),   // ISO date string
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
 });

@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {toast} from "sonner"
+import { getClientCookie } from '@/utils/cookie'
 
 export default function TestimonialForm() {
 
@@ -19,15 +20,34 @@ export default function TestimonialForm() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const [, setIsLoaded] = useState(false)
+  
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined);
+    
+  useEffect(() => {
+    setIsLoaded(true);
+    const token = getClientCookie('x-csrf-token');
+    setClientCsrfToken(token);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault()
     setIsSubmitting(true)
+
+    if (!clientCsrfToken) {
+      toast("Registration Failed!", {
+        description: "CSRF token not available. Please refresh the page.",
+      });
+      return;
+    }
 
     try {
       const response = await fetch('/api/testimonials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': clientCsrfToken,
         },
         body: JSON.stringify(formData),
       })

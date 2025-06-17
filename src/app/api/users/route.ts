@@ -3,9 +3,6 @@ import {prisma} from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { registerSchema } from '@/lib/zod-schemas';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-// Removed validateCsrfToken and sanitizeObject imports as middleware handles CSRF and validation is by Zod.
-// Assuming sanitizeObject is handled via Zod's parsing or is applied earlier if needed universally.
-// If you still use sanitizeObject for other purposes, keep its import and usage.
 
 // Fetches all users from the database.
 export async function GET() {
@@ -29,17 +26,12 @@ export async function GET() {
 
 // Handles user registration with validation, password hashing, and default role assignment.
 export async function POST(request: Request) {
+
   try {
-    // CSRF validation is now primarily handled by the middleware.
-    // If this function is reached, CSRF should have passed.
 
-    const body = await request.json(); // Parse the request body as JSON
-    const requestData = body; // Assume JSON body for registration
+    const body = await request.json();
+    const requestData = body;
 
-    // Validate and sanitize input
-    // The `cleanData` step using `sanitizeObject` is now less critical here if Zod's safeParse
-    // and your frontend inputs are properly constrained. If `sanitizeObject` is for XSS/SQL injection,
-    // ensure those are also handled by Zod's refinements or by Prisma's parameterized queries.
     const validatedData = registerSchema.safeParse(requestData);
     if (!validatedData.success) {
       console.error("Validation failed for /api/users POST:", validatedData.error.flatten().fieldErrors);
@@ -51,10 +43,8 @@ export async function POST(request: Request) {
 
     const { fullName, email, password } = validatedData.data; // Already cleaned by Zod if you use transforms
 
-    // Hash the plain-text password using bcryptjs
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the new user in the database
     const user = await prisma.user.create({
       data: {
         name: fullName,

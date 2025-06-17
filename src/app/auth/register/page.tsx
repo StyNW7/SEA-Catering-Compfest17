@@ -58,10 +58,8 @@ export default function RegisterPage() {
 
   useEffect(() => {
     setIsLoaded(true);
-    // Fetch the client-readable CSRF token from the cookie
-    const token = getClientCookie('x-csrf-token'); // Read the non-httpOnly cookie
+    const token = getClientCookie('x-csrf-token');
     setClientCsrfToken(token);
-    console.log("Client-side CSRF Token (x-csrf-token):", token)
   }, []);
 
   const onSubmit = async (data: RegisterFormValues) => {

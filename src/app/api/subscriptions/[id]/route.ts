@@ -7,6 +7,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse>  {
+
   try {
     
     const id = (await params).id; 
@@ -33,6 +34,7 @@ export async function GET(
     }
 
     return NextResponse.json(subscription)
+
   } catch (error) {
     console.error('Error fetching subscription:', error)
     return NextResponse.json(
@@ -89,6 +91,7 @@ export async function PUT(
     })
 
     return NextResponse.json(updatedSubscription)
+
   } catch (error) {
     console.error('Error updating subscription:', error)
     return NextResponse.json(
@@ -135,10 +138,11 @@ export async function DELETE(
       { status: 500 }
     )
   }
+
 }
 
 
-
+// PATCH SUBSCRIPTIONS
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -187,8 +191,8 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
 
+}
 
 
 // Reusable calculateTotalPrice function

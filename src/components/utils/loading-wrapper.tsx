@@ -40,7 +40,7 @@ export default function LoadingWrapper({ children }: { children: React.ReactNode
       <LoadingScreen 
         isLoading={isLoading} 
         message={loadingMessage}
-        key={loadingKey} // Pass key to force remount
+        key={loadingKey}
       />
       {children}
     </>

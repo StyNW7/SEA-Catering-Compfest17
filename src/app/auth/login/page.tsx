@@ -95,7 +95,6 @@ export default function LoginPage() {
       setIsLoaded(true);
       const token = getClientCookie('x-csrf-token');
       setClientCsrfToken(token);
-      console.log("Client-side CSRF Token (x-csrf-token):", token)
     }, []);
 
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {

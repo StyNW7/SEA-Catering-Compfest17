@@ -5,7 +5,9 @@ import { getServerSession } from '@/lib/session'
 
 // Get all subscriptions (for current user or filtered)
 export async function GET(request: Request) {
+
   try {
+
     const session = await getServerSession();
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
@@ -18,10 +20,12 @@ export async function GET(request: Request) {
     if (userId) {
       where.userId = userId
     } 
+
     // Otherwise use logged-in user's ID
     else if (session?.user?.id) {
       where.userId = session.user.id
     }
+
     // No user ID available
     else {
       return NextResponse.json(
@@ -53,6 +57,7 @@ export async function GET(request: Request) {
     })
 
     return NextResponse.json(subscriptions)
+    
   } catch (error) {
     console.error('Error fetching subscriptions:', error)
     return NextResponse.json(

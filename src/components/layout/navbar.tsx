@@ -10,18 +10,7 @@ import { cn } from "@/lib/utils"
 import { useMobileMenu } from "@/hooks/useMobileMenu"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-
-// Helper function to get a cookie value on the client-side
-function getClientCookie(name: string): string | undefined {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for(let i=0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-  }
-  return undefined;
-}
+import { getClientCookie } from "@/utils/cookie"
 
 export function Navbar() {
 
@@ -39,21 +28,13 @@ export function Navbar() {
 
   const [, setIsLoaded] = useState(false)
 
-  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined);
+  const [clientCsrfToken, setClientCsrfToken] = useState<string | undefined>(undefined)
     
   useEffect(() => {
     setIsLoaded(true);
     const token = getClientCookie('x-csrf-token');
     setClientCsrfToken(token);
-    console.log("Client-side CSRF Token (x-csrf-token):", token)
   }, []);
-
-  if (!clientCsrfToken) {
-    toast("Registration Failed!", {
-      description: "CSRF token not available. Please refresh the page.",
-    });
-    return;
-  }
 
   const onSubmit = async () => {
     try {
