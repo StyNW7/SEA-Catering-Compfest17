@@ -32,6 +32,7 @@ export async function middleware(request: NextRequest) {
       maxAge: 60 * 60 * 24, // 1 day
       path: '/',
     });
+
     response.cookies.set('x-csrf-token', newToken, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
@@ -39,7 +40,9 @@ export async function middleware(request: NextRequest) {
       maxAge: 60 * 60 * 24, // 1 day
       path: '/',
     });
+    
     currentHttpOnlyToken = newToken;
+
   }
 
   // Validate CSRF token for mutating requests (POST, PUT, PATCH, DELETE)
