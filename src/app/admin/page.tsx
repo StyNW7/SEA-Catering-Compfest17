@@ -626,7 +626,7 @@ export default function AdminDashboard() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: any) => [`${value}%`, "Share"]} />
+                      <Tooltip formatter={(value: any) => [`${value}`, "Count"]} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -637,12 +637,14 @@ export default function AdminDashboard() {
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: plan.color }} />
                         <span className="text-sm font-medium">{plan.name}</span>
                       </div>
-                      <span className="text-sm text-muted-foreground">{plan.value}%</span>
+                      <span className="text-sm text-muted-foreground">{plan.value}</span>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
+
+            {/* Future Implementation */}
 
             {/* Recent Activity */}
             {/* <Card className="col-span-2">
@@ -661,7 +663,7 @@ export default function AdminDashboard() {
                   {[
                     {
                       type: "new",
-                      user: "Sarah Johnson",
+                      user: "Stanley",
                       action: "subscribed to Protein Plan",
                       time: "2 minutes ago",
                       icon: UserPlus,
@@ -669,7 +671,7 @@ export default function AdminDashboard() {
                     },
                     {
                       type: "pause",
-                      user: "Michael Chen",
+                      user: "Stanley",
                       action: "paused Diet Plan subscription",
                       time: "15 minutes ago",
                       icon: Pause,
@@ -677,7 +679,7 @@ export default function AdminDashboard() {
                     },
                     {
                       type: "upgrade",
-                      user: "Lisa Wong",
+                      user: "Stanley",
                       action: "upgraded to Royal Plan",
                       time: "1 hour ago",
                       icon: Crown,
@@ -685,7 +687,7 @@ export default function AdminDashboard() {
                     },
                     {
                       type: "reactivate",
-                      user: "David Kim",
+                      user: "Stanley",
                       action: "reactivated subscription",
                       time: "2 hours ago",
                       icon: Repeat,
@@ -693,7 +695,7 @@ export default function AdminDashboard() {
                     },
                     {
                       type: "cancel",
-                      user: "Emma Davis",
+                      user: "Stanley",
                       action: "cancelled subscription",
                       time: "3 hours ago",
                       icon: X,

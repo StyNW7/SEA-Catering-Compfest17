@@ -20,18 +20,18 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 ---
 
 ## 📃 Table of Contents
-- [Complete Documentation](#📚-complete-documentation)
-- [Technology Stack](#🛠️-technology-stack)
-- [Core Features](#🧩-core-features)
-- [Live Demo](#🚀-live-demo)
-- [Account Information](#👤-account-information)
-- [Getting Started Locally](#🧰-getting-started-locally)
-- [env Configuration](#🔐-env-configuration)
-- [Website Preview](#🖼️-website-preview)
-- [Satzinger’s Diagram](#🧭-diagram)
-- [API Documentation](#🔥-api-documentation)
-- [Owner](#👥-owner)
-- [Contact](#📬-contact)
+- [Complete Documentation](#-complete-documentation)
+- [Technology Stack](#-technology-stack)
+- [Core Features](#-core-features)
+- [Live Demo](#-live-demo)
+- [Account Information](#-account-information)
+- [Getting Started Locally](#-getting-started-locally)
+- [env Configuration](#-env-configuration)
+- [Website Preview](#-website-preview)
+- [Satzinger’s Diagram](#-diagram)
+- [API Documentation](#-api-documentation)
+- [Owner](#-owner)
+- [Contact](#-contact)
 
 ---
 
@@ -150,7 +150,7 @@ Visit the live website demo here:
 
 > [!TIP]
 > 
-> If you run it locally, just run the seeding. However, if you use the deployment this is accounts that you can use
+> If you run it locally, just run the seeding (make sure you already setup the Postgres Database and .env file). However, if you use the deployment this is accounts that you can use
 
 #### Admin Account
 - **Email**: admin@seacatering.com
