@@ -46,7 +46,7 @@ SEA Catering is a customizable healthy meal service delivering across Indonesia.
 
 ---
 
-## Technology Stack
+## ⚙️ Technology Stack
 
 <div align="center">
 <a href="https://nextjs.org/">
